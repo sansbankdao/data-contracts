@@ -1,0 +1,114 @@
+/*******************************************************************************
+ * Copyright (c) 2025 aBitSuite
+ * Released under the MIT License.
+ *
+ * SANS
+ *
+ * Official Governance Token of Sansbank DAO
+ *
+ * Ava's DAO is a non-profit organization on a mission to build and manage a
+ * comprehensive suite of products & services with the prime directive of
+ * assuring financial freedom for every man, woman and child.
+ *
+ * Every $AVAS holder is permitted to Vote (on-chain) for public proposals.
+ * 'Qualified' $AVAS holders receive Daily Payouts (to their respective Nexa or
+ * Meta address) from revenues deposited into Ava's Treasury.
+ *
+ * PLEASE NOTE:
+ * To use contract documents as NFTs, configure settings for modifying
+ * deleting, transferring, trading, or restricting creation as needed
+ *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ * TECHNICAL INFORMATION
+ *
+ * Version     : 01
+ * Script Hash : 0x0
+ * Namespace   : TBD
+ *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ * TEAM CONTACT INFORMATION
+ *
+ * 3455 Peachtree Rd NE
+ * Suite #500
+ * Atlanta, GA 30326
+ *
+ * Email: support@sansbank.org
+ * X (formerly Twitter): @SansbankDAO
+ *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ * For more information, please visit the following resources:
+ * - https://sansbank.org/bootstrap
+ * - https://sansbank.org
+ *
+ */
+{
+  "card": {
+    "type": "object",
+    "documentsMutable": false,    // true = documents can be modified (replaced)
+    "canBeDeleted": true,         // true = documents can be deleted
+    "transferable": 1,            // 0 = transfers disabled; 1 = transfers enabled
+    "tradeMode": 1,               // 0 = no trading; 1 = direct purchases
+    "creationRestrictionMode": 1, // 0 = anyone can mint; 1 = only contract owner can mint
+    "properties": {
+      "name": {
+        "type": "string",
+        "description": "Name of the card",
+        "minLength": 0,
+        "maxLength": 63,
+        "position": 0
+      },
+      "description": {
+        "type": "string",
+        "description": "Description of the card",
+        "minLength": 0,
+        "maxLength": 256,
+        "position": 1
+      },
+      "attack": {
+        "type": "integer",
+        "description": "Attack power of the card",
+        "position": 2
+      },
+      "defense": {
+        "type": "integer",
+        "description": "Defense level of the card",
+        "position": 3
+      }
+    },
+    "indices": [
+      {
+        "name": "owner",
+        "properties": [
+          {
+            "$ownerId": "asc"
+          }
+        ]
+      },
+      {
+        "name": "attack",
+        "properties": [
+          {
+            "attack": "asc"
+          }
+        ]
+      },
+      {
+        "name": "defense",
+        "properties": [
+          {
+            "defense": "asc"
+          }
+        ]
+      }
+    ],
+    "required": [
+      "name",
+      "attack",
+      "defense"
+    ],
+    "additionalProperties": false
+  }
+}
