@@ -45,70 +45,152 @@
  *
  */
 {
-  "card": {
-    "type": "object",
-    "documentsMutable": false,    // true = documents can be modified (replaced)
-    "canBeDeleted": true,         // true = documents can be deleted
-    "transferable": 1,            // 0 = transfers disabled; 1 = transfers enabled
-    "tradeMode": 1,               // 0 = no trading; 1 = direct purchases
-    "creationRestrictionMode": 1, // 0 = anyone can mint; 1 = only contract owner can mint
-    "properties": {
-      "name": {
-        "type": "string",
-        "description": "Name of the card",
-        "minLength": 0,
-        "maxLength": 63,
-        "position": 0
-      },
-      "description": {
-        "type": "string",
-        "description": "Description of the card",
-        "minLength": 0,
-        "maxLength": 256,
-        "position": 1
-      },
-      "attack": {
-        "type": "integer",
-        "description": "Attack power of the card",
-        "position": 2
-      },
-      "defense": {
-        "type": "integer",
-        "description": "Defense level of the card",
-        "position": 3
-      }
-    },
-    "indices": [
-      {
-        "name": "owner",
-        "properties": [
-          {
-            "$ownerId": "asc"
+  "tokens": {
+    "0": {
+      "$format_version": "0",
+      "conventions": {
+        "$format_version": "0",
+        "localizations": {
+          "en": {
+            "$format_version": "0",
+            "shouldCapitalize": true,
+            "singularForm": "sansbuck",
+            "pluralForm": "sansbucks"
           }
-        ]
+        },
+        "decimals": 8
       },
-      {
-        "name": "attack",
-        "properties": [
-          {
-            "attack": "asc"
-          }
-        ]
+      "conventionsChangeRules": {
+        "V0": {
+          "authorized_to_make_change": "NoOne",
+          "admin_action_takers": "NoOne",
+          "changing_authorized_action_takers_to_no_one_allowed": false,
+          "changing_admin_action_takers_to_no_one_allowed": false,
+          "self_changing_admin_action_takers_allowed": false
+        }
       },
-      {
-        "name": "defense",
-        "properties": [
-          {
-            "defense": "asc"
+      "baseSupply": 1000000,
+      "maxSupply": 10000000,
+      "keepsHistory": {
+        "$format_version": "0",
+        "keepsTransferHistory": true,
+        "keepsFreezingHistory": true,
+        "keepsMintingHistory": true,
+        "keepsBurningHistory": true,
+        "keepsDirectPricingHistory": true,
+        "keepsDirectPurchaseHistory": true
+      },
+      "startAsPaused": false,
+      "allowTransferToFrozenBalance": true,
+      "maxSupplyChangeRules": {
+        "V0": {
+          "authorized_to_make_change": "ContractOwner",
+          "admin_action_takers": "NoOne",
+          "changing_authorized_action_takers_to_no_one_allowed": false,
+          "changing_admin_action_takers_to_no_one_allowed": false,
+          "self_changing_admin_action_takers_allowed": false
+        }
+      },
+      "distributionRules": {
+        "$format_version": "0",
+        "perpetualDistribution": null,
+        "perpetualDistributionRules": {
+          "V0": {
+            "authorized_to_make_change": "NoOne",
+            "admin_action_takers": "NoOne",
+            "changing_authorized_action_takers_to_no_one_allowed": false,
+            "changing_admin_action_takers_to_no_one_allowed": false,
+            "self_changing_admin_action_takers_allowed": false
           }
-        ]
-      }
-    ],
-    "required": [
-      "name",
-      "attack",
-      "defense"
-    ],
-    "additionalProperties": false
+        },
+        "preProgrammedDistribution": null,
+        "newTokensDestinationIdentity": null,
+        "newTokensDestinationIdentityRules": {
+          "V0": {
+            "authorized_to_make_change": "ContractOwner",
+            "admin_action_takers": "NoOne",
+            "changing_authorized_action_takers_to_no_one_allowed": false,
+            "changing_admin_action_takers_to_no_one_allowed": false,
+            "self_changing_admin_action_takers_allowed": false
+          }
+        },
+        "mintingAllowChoosingDestination": true,
+        "mintingAllowChoosingDestinationRules": {
+          "V0": {
+            "authorized_to_make_change": "ContractOwner",
+            "admin_action_takers": "NoOne",
+            "changing_authorized_action_takers_to_no_one_allowed": false,
+            "changing_admin_action_takers_to_no_one_allowed": false,
+            "self_changing_admin_action_takers_allowed": false
+          }
+        },
+        "changeDirectPurchasePricingRules": {
+          "V0": {
+            "authorized_to_make_change": "ContractOwner",
+            "admin_action_takers": "NoOne",
+            "changing_authorized_action_takers_to_no_one_allowed": false,
+            "changing_admin_action_takers_to_no_one_allowed": false,
+            "self_changing_admin_action_takers_allowed": false
+          }
+        }
+      },
+      "manualMintingRules": {
+        "V0": {
+          "authorized_to_make_change": "ContractOwner",
+          "admin_action_takers": "NoOne",
+          "changing_authorized_action_takers_to_no_one_allowed": false,
+          "changing_admin_action_takers_to_no_one_allowed": false,
+          "self_changing_admin_action_takers_allowed": false
+        }
+      },
+      "manualBurningRules": {
+        "V0": {
+          "authorized_to_make_change": "ContractOwner",
+          "admin_action_takers": "NoOne",
+          "changing_authorized_action_takers_to_no_one_allowed": false,
+          "changing_admin_action_takers_to_no_one_allowed": false,
+          "self_changing_admin_action_takers_allowed": false
+        }
+      },
+      "freezeRules": {
+        "V0": {
+          "authorized_to_make_change": "NoOne",
+          "admin_action_takers": "NoOne",
+          "changing_authorized_action_takers_to_no_one_allowed": false,
+          "changing_admin_action_takers_to_no_one_allowed": false,
+          "self_changing_admin_action_takers_allowed": false
+        }
+      },
+      "unfreezeRules": {
+        "V0": {
+          "authorized_to_make_change": "NoOne",
+          "admin_action_takers": "NoOne",
+          "changing_authorized_action_takers_to_no_one_allowed": false,
+          "changing_admin_action_takers_to_no_one_allowed": false,
+          "self_changing_admin_action_takers_allowed": false
+        }
+      },
+      "destroyFrozenFundsRules": {
+        "V0": {
+          "authorized_to_make_change": "NoOne",
+          "admin_action_takers": "NoOne",
+          "changing_authorized_action_takers_to_no_one_allowed": false,
+          "changing_admin_action_takers_to_no_one_allowed": false,
+          "self_changing_admin_action_takers_allowed": false
+        }
+      },
+      "emergencyActionRules": {
+        "V0": {
+          "authorized_to_make_change": "NoOne",
+          "admin_action_takers": "NoOne",
+          "changing_authorized_action_takers_to_no_one_allowed": false,
+          "changing_admin_action_takers_to_no_one_allowed": false,
+          "self_changing_admin_action_takers_allowed": false
+        }
+      },
+      "mainControlGroup": null,
+      "mainControlGroupCanBeModified": "NoOne",
+      "description": "Reward token for customer loyalty program"
+    }
   }
 }
