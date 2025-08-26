@@ -2,14 +2,14 @@
  * Copyright (c) 2025 Sansbank DAO
  * Released under the MIT License.
  *
- * Bootstrap
+ * Evolution Collectible
  *
- * A data contract for transparently managing contributions to a project's
- * bootstrap campaign.
+ * A self-contained non-fungible token (NFT) with all of its data and
+ * metadata held within the data contract.
  *
  * PLEASE NOTE:
- * To use contract documents as NFTs, configure settings for modifying
- * deleting, transferring, trading, or restricting creation as needed
+ * In the event that the collectible is "destroyed", its remaining data
+ * storage escrow will be returned to its owner.
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *

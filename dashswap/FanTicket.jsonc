@@ -1,0 +1,70 @@
+// To use contract documents as NFTs, configure settings for modifying
+// deleting, transferring, trading, or restricting creation as needed
+{
+  "card": {
+    "type": "object",
+    "documentsMutable": false,    // true = documents can be modified (replaced)
+    "canBeDeleted": true,         // true = documents can be deleted
+    "transferable": 1,            // 0 = transfers disabled; 1 = transfers enabled
+    "tradeMode": 1,               // 0 = no trading; 1 = direct purchases
+    "creationRestrictionMode": 1, // 0 = anyone can mint; 1 = only contract owner can mint
+    "properties": {
+      "name": {
+        "type": "string",
+        "description": "Name of the card",
+        "minLength": 0,
+        "maxLength": 63,
+        "position": 0
+      },
+      "description": {
+        "type": "string",
+        "description": "Description of the card",
+        "minLength": 0,
+        "maxLength": 256,
+        "position": 1
+      },
+      "attack": {
+        "type": "integer",
+        "description": "Attack power of the card",
+        "position": 2
+      },
+      "defense": {
+        "type": "integer",
+        "description": "Defense level of the card",
+        "position": 3
+      }
+    },
+    "indices": [
+      {
+        "name": "owner",
+        "properties": [
+          {
+            "$ownerId": "asc"
+          }
+        ]
+      },
+      {
+        "name": "attack",
+        "properties": [
+          {
+            "attack": "asc"
+          }
+        ]
+      },
+      {
+        "name": "defense",
+        "properties": [
+          {
+            "defense": "asc"
+          }
+        ]
+      }
+    ],
+    "required": [
+      "name",
+      "attack",
+      "defense"
+    ],
+    "additionalProperties": false
+  }
+}
