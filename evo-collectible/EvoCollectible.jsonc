@@ -7,9 +7,16 @@
  * A self-contained non-fungible token (NFT) with all of its data and
  * metadata held within the data contract.
  *
+ * This data contract consists of FIVE (5) document schemas:
+ *   1. Item
+ *   2. Creator
+ *   3. Media
+ *   4. Collection
+ *   5. License
+ *
  * PLEASE NOTE:
- * In the event that the collectible is "destroyed", its remaining data
- * storage escrow will be returned to its owner.
+ * In the event that the collectible is "destroyed", the remainder of its
+ * MEDIA (50yr data storage) escrow will be refunded to the current owner.
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -18,11 +25,84 @@
  * Namespace   : TBD
  *
  * For more information, please visit the following resources:
- * - https://sansbank.org/bootstrap
+ * - https://dashswap.xyz/launcher
  * - https://sansbank.org
  *
  */
 {
+    "item": {
+        "type": "object",
+        "indices": [
+            {
+                "name": "ownerId",
+                "properties": [
+                    {
+                        "$ownerId": "asc"
+                    }
+                ],
+                "unique": true
+            },
+            {
+                "name": "ownerIdAndUpdatedAt",
+                "properties": [
+                    {
+                        "$ownerId": "asc"
+                    },
+                    {
+                        "$updatedAt": "asc"
+                    }
+                ]
+            }
+        ],
+        "properties": {
+            "avatarUrl": {
+                "type": "string",
+                "format": "uri",
+                "minLength": 1,
+                "maxLength": 2048,
+                "position": 0
+            },
+            "avatarHash": {
+                "type": "array",
+                "byteArray": true,
+                "minItems": 32,
+                "maxItems": 32,
+                "description": "SHA256 hash of the bytes of the image specified by avatarUrl",
+                "position": 1
+            },
+            "avatarFingerprint": {
+                "type": "array",
+                "byteArray": true,
+                "minItems": 8,
+                "maxItems": 8,
+                "description": "dHash the image specified by avatarUrl",
+                "position": 2
+            },
+            "publicMessage": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 140,
+                "position": 3
+            },
+            "displayName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 25,
+                "position": 4
+            }
+        },
+        "minProperties": 1,
+        "dependentRequired": {
+            "avatarUrl": ["avatarHash", "avatarFingerprint"],
+            "avatarHash": ["avatarUrl", "avatarFingerprint"],
+            "avatarFingerprint": ["avatarUrl", "avatarHash"]
+        },
+        "required": [
+            "$createdAt",
+            "$updatedAt"
+        ],
+        "additionalProperties": false
+    },
     "profile": {
         "type": "object",
         "indices": [
@@ -163,7 +243,7 @@
         ],
         "additionalProperties": false
     },
-    "contactRequest": {
+    "royaltyRequest": {
         "documentsMutable": false,
         "canBeDeleted": false,
         "requiresIdentityEncryptionBoundedKey": 2,
@@ -274,6 +354,43 @@
             "recipientKeyIndex",
             "accountReference"
         ],
+        "additionalProperties": false
+    },
+    "mymedia": {
+        "type": "object",
+        "$comment": "Allows for the embedded storage of collectible media.",
+        "properties": {
+            "title": {
+                "type": "string",
+                "position": 0,
+                "maxLength": 63
+            },
+            "size": {
+                "type": "string",
+                "position": 1
+            },
+            "payload": {
+                "type": "array",
+                "maxItems": 1000,
+                "minItems": 1,
+                "position": 2,
+                "byteArray": true,
+                "description": "The binary representation of the media data."
+            }
+        },
+        "indices": [
+            {
+                "name": "idx_title",
+                "unique": false,
+                "properties": [
+                    {
+                        "title": "asc"
+                    }
+                ]
+            }
+        ],
+        "canBeDeleted": true,
+        "documentsMutable": false,
         "additionalProperties": false
     }
 }
