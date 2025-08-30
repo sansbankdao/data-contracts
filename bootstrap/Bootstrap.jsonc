@@ -23,8 +23,6 @@
  *
  */
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://sansbank.org/schemas/Bootstrap.jsonc",
     "contributor": {
         "type": "object",
         "indices": [

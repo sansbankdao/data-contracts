@@ -30,8 +30,6 @@
  *
  */
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://sansbank.org/schemas/EvoCollectible.jsonc",
     "item": {
         "type": "object",
         "$comment": "A piece of digital media.",
@@ -119,23 +117,23 @@
         ],
         "properties": {
             "avatarUrl": {
+                "position": 0,
                 "type": "string",
                 "format": "uri",
                 "minLength": 1,
-                "maxLength": 2048,
-                "position": 0
+                "maxLength": 2048
             },
             "publicMessage": {
+                "position": 1,
                 "type": "string",
                 "minLength": 1,
-                "maxLength": 140,
-                "position": 3
+                "maxLength": 140
             },
             "displayName": {
+                "position": 2,
                 "type": "string",
                 "minLength": 1,
-                "maxLength": 25,
-                "position": 4
+                "maxLength": 25
             }
         },
         "minProperties": 1,
@@ -165,16 +163,16 @@
         ],
         "properties": {
             "title": {
+                "position": 0,
                 "type": "string",
                 "minLength": 1,
-                "maxLength": 100,
-                "position": 0
+                "maxLength": 100
             },
             "about": {
+                "position": 1,
                 "type": "string",
                 "minLength": 1,
-                "maxLength": 2500,
-                "position": 1
+                "maxLength": 2500
             }
         },
         "required": [
@@ -238,47 +236,47 @@
         "properties": {
             "toUserId": {
                 "type": "array",
+                "position": 0,
                 "byteArray": true,
                 "minItems": 32,
                 "maxItems": 32,
-                "position": 0,
                 "contentMediaType": "application/x.dash.dpp.identifier"
             },
             "encryptedPublicKey": {
                 "type": "array",
+                "position": 1,
                 "byteArray": true,
                 "minItems": 96,
-                "maxItems": 96,
-                "position": 1
+                "maxItems": 96
             },
             "senderKeyIndex": {
                 "type": "integer",
-                "minimum": 0,
-                "position": 2
+                "position": 2,
+                "minimum": 0
             },
             "recipientKeyIndex": {
                 "type": "integer",
-                "minimum": 0,
-                "position": 3
+                "position": 3,
+                "minimum": 0
             },
             "accountReference": {
                 "type": "integer",
-                "minimum": 0,
-                "position": 4
+                "position": 4,
+                "minimum": 0
             },
             "encryptedAccountLabel": {
                 "type": "array",
+                "position": 5,
                 "byteArray": true,
                 "minItems": 48,
-                "maxItems": 80,
-                "position": 5
+                "maxItems": 80
             },
             "autoAcceptProof": {
                 "type": "array",
+                "position": 6,
                 "byteArray": true,
                 "minItems": 38,
-                "maxItems": 102,
-                "position": 6
+                "maxItems": 102
             }
         },
         "required": [
