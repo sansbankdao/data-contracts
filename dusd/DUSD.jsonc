@@ -4,7 +4,8 @@
  *
  * DUSD
  *
- * TBD
+ * Dash USD (DUSD), an instant settlement, low-fee stablecoin with built-in
+ * censorship resistance.
  *
  * PLEASE NOTE:
  * To use contract documents as NFTs, configure settings for modifying
@@ -46,11 +47,11 @@
           "en": {
             "$format_version": "0",
             "shouldCapitalize": true,
-            "singularForm": "sansbuck",
-            "pluralForm": "sansbucks"
+            "singularForm": "DUSD",
+            "pluralForm": "DUSD"
           }
         },
-        "decimals": 8
+        "decimals": 6
       },
       "conventionsChangeRules": {
         "V0": {
@@ -61,8 +62,8 @@
           "self_changing_admin_action_takers_allowed": false
         }
       },
-      "baseSupply": 1000000,
-      "maxSupply": 10000000,
+      "baseSupply": 100000000,
+      "maxSupply": null,
       "keepsHistory": {
         "$format_version": "0",
         "keepsTransferHistory": true,
@@ -76,7 +77,7 @@
       "allowTransferToFrozenBalance": true,
       "maxSupplyChangeRules": {
         "V0": {
-          "authorized_to_make_change": "ContractOwner",
+          "authorized_to_make_change": "NoOne",
           "admin_action_takers": "NoOne",
           "changing_authorized_action_takers_to_no_one_allowed": false,
           "changing_admin_action_takers_to_no_one_allowed": false,
@@ -96,20 +97,20 @@
           }
         },
         "preProgrammedDistribution": null,
-        "newTokensDestinationIdentity": null,
+        "newTokensDestinationIdentity": "3sL6q6eVCR6y8Ld6Gr14cedhJWNBPmBp3S5VtRcckxzE",
         "newTokensDestinationIdentityRules": {
           "V0": {
-            "authorized_to_make_change": "ContractOwner",
+            "authorized_to_make_change": "NoOne",
             "admin_action_takers": "NoOne",
             "changing_authorized_action_takers_to_no_one_allowed": false,
             "changing_admin_action_takers_to_no_one_allowed": false,
             "self_changing_admin_action_takers_allowed": false
           }
         },
-        "mintingAllowChoosingDestination": true,
+        "mintingAllowChoosingDestination": false,
         "mintingAllowChoosingDestinationRules": {
           "V0": {
-            "authorized_to_make_change": "ContractOwner",
+            "authorized_to_make_change": "NoOne",
             "admin_action_takers": "NoOne",
             "changing_authorized_action_takers_to_no_one_allowed": false,
             "changing_admin_action_takers_to_no_one_allowed": false,
@@ -119,7 +120,20 @@
         "changeDirectPurchasePricingRules": {
           "V0": {
             "authorized_to_make_change": "ContractOwner",
-            "admin_action_takers": "NoOne",
+            "admin_action_takers": "ContractOwner",
+            "changing_authorized_action_takers_to_no_one_allowed": false,
+            "changing_admin_action_takers_to_no_one_allowed": false,
+            "self_changing_admin_action_takers_allowed": false
+          }
+        }
+      },
+      "marketplaceRules": {
+        "$format_version": "0",
+        "tradeMode": "NotTradeable",
+        "tradeModeChangeRules": {
+          "V0": {
+            "authorized_to_make_change": "ContractOwner",
+            "admin_action_takers": "ContractOwner",
             "changing_authorized_action_takers_to_no_one_allowed": false,
             "changing_admin_action_takers_to_no_one_allowed": false,
             "self_changing_admin_action_takers_allowed": false
@@ -129,7 +143,7 @@
       "manualMintingRules": {
         "V0": {
           "authorized_to_make_change": "ContractOwner",
-          "admin_action_takers": "NoOne",
+          "admin_action_takers": "ContractOwner",
           "changing_authorized_action_takers_to_no_one_allowed": false,
           "changing_admin_action_takers_to_no_one_allowed": false,
           "self_changing_admin_action_takers_allowed": false
@@ -138,7 +152,7 @@
       "manualBurningRules": {
         "V0": {
           "authorized_to_make_change": "ContractOwner",
-          "admin_action_takers": "NoOne",
+          "admin_action_takers": "ContractOwner",
           "changing_authorized_action_takers_to_no_one_allowed": false,
           "changing_admin_action_takers_to_no_one_allowed": false,
           "self_changing_admin_action_takers_allowed": false
@@ -182,7 +196,13 @@
       },
       "mainControlGroup": null,
       "mainControlGroupCanBeModified": "NoOne",
-      "description": "Reward token for customer loyalty program"
+      "description": "Dash USD (DUSD), an instant settlement, low-fee stablecoin with built-in censorship resistance."
     }
-  }
+  },
+  "keywords": [
+    "usd",
+    "usdt",
+    "usdc"
+  ],
+  "description": "Dash USD (DUSD), an instant settlement, low-fee stablecoin with built-in censorship resistance."
 }
