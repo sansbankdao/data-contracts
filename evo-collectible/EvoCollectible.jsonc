@@ -1,4 +1,4 @@
-/*******************************************************************************
+s/*******************************************************************************
  * Copyright (c) 2025 Sansbank DAO
  * Released under the MIT License.
  *
@@ -30,36 +30,24 @@
  *
  */
 {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "item": {
         "type": "object",
+        "$comment": "A piece of digital media.",
         "indices": [
             {
-                "name": "ownerId",
+                "name": "idx_ownerid",
                 "properties": [
                     {
                         "$ownerId": "asc"
                     }
                 ],
                 "unique": true
-            },
-            {
-                "name": "ownerIdAndUpdatedAt",
-                "properties": [
-                    {
-                        "$ownerId": "asc"
-                    },
-                    {
-                        "$updatedAt": "asc"
-                    }
-                ]
             }
         ],
         "properties": {
-            "avatarUrl": {
-                "type": "string",
-                "format": "uri",
-                "minLength": 1,
-                "maxLength": 2048,
+            "pieces": {
+                "type": "integer",
                 "position": 0
             },
             "avatarHash": {
@@ -103,8 +91,9 @@
         ],
         "additionalProperties": false
     },
-    "profile": {
+    "creator": {
         "type": "object",
+        "$comment": "The original Creator of the digital media.",
         "indices": [
             {
                 "name": "ownerId",
@@ -135,22 +124,6 @@
                 "maxLength": 2048,
                 "position": 0
             },
-            "avatarHash": {
-                "type": "array",
-                "byteArray": true,
-                "minItems": 32,
-                "maxItems": 32,
-                "description": "SHA256 hash of the bytes of the image specified by avatarUrl",
-                "position": 1
-            },
-            "avatarFingerprint": {
-                "type": "array",
-                "byteArray": true,
-                "minItems": 8,
-                "maxItems": 8,
-                "description": "dHash the image specified by avatarUrl",
-                "position": 2
-            },
             "publicMessage": {
                 "type": "string",
                 "minLength": 1,
@@ -176,129 +149,46 @@
         ],
         "additionalProperties": false
     },
-    "contactInfo": {
+    "collection": {
         "type": "object",
         "indices": [
             {
-                "name": "ownerIdAndKeys",
+                "name": "ownerId",
                 "properties": [
                     {
                         "$ownerId": "asc"
-                    },
-                    {
-                        "rootEncryptionKeyIndex": "asc"
-                    },
-                    {
-                        "derivationEncryptionKeyIndex": "asc"
                     }
                 ],
                 "unique": true
-            },
-            {
-                "name": "ownerIdAndUpdatedAt",
-                "properties": [
-                    {
-                        "$ownerId": "asc"
-                    },
-                    {
-                        "$updatedAt": "asc"
-                    }
-                ]
             }
         ],
         "properties": {
-            "encToUserId": {
-                "type": "array",
-                "byteArray": true,
-                "minItems": 32,
-                "maxItems": 32,
+            "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100,
                 "position": 0
             },
-            "rootEncryptionKeyIndex": {
-                "type": "integer",
-                "minimum": 0,
+            "about": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2500,
                 "position": 1
-            },
-            "derivationEncryptionKeyIndex": {
-                "type": "integer",
-                "minimum": 0,
-                "position": 2
-            },
-            "privateData": {
-                "type": "array",
-                "byteArray": true,
-                "minItems": 48,
-                "maxItems": 2048,
-                "position": 3,
-                "description": "This is the encrypted values of aliasName + note + displayHidden encoded as an array in cbor"
             }
         },
         "required": [
             "$createdAt",
-            "$updatedAt",
-            "encToUserId",
-            "privateData",
-            "rootEncryptionKeyIndex",
-            "derivationEncryptionKeyIndex"
+            "$updatedAt"
         ],
         "additionalProperties": false
     },
-    "royaltyRequest": {
+    "license": {
+        "type": "object",
+        "$comment": "Allows for licensing Creator content.",
         "documentsMutable": false,
         "canBeDeleted": false,
-        "requiresIdentityEncryptionBoundedKey": 2,
-        "requiresIdentityDecryptionBoundedKey": 2,
-        "type": "object",
-        "indices": [
-            {
-                "name": "ownerIdUserIdAndAccountRef",
-                "properties": [
-                    {
-                        "$ownerId": "asc"
-                    },
-                    {
-                        "toUserId": "asc"
-                    },
-                    {
-                        "accountReference": "asc"
-                    }
-                ],
-                "unique": true
-            },
-            {
-                "name": "ownerIdUserId",
-                "properties": [
-                    {
-                        "$ownerId": "asc"
-                    },
-                    {
-                        "toUserId": "asc"
-                    }
-                ]
-            },
-            {
-                "name": "userIdCreatedAt",
-                "properties": [
-                    {
-                        "toUserId": "asc"
-                    },
-                    {
-                        "$createdAt": "asc"
-                    }
-                ]
-            },
-            {
-                "name": "ownerIdCreatedAt",
-                "properties": [
-                    {
-                        "$ownerId": "asc"
-                    },
-                    {
-                        "$createdAt": "asc"
-                    }
-                ]
-            }
-        ],
+        "requiresIdentityEncryptionBoundedKey": null,
+        "requiresIdentityDecryptionBoundedKey": null,
         "properties": {
             "toUserId": {
                 "type": "array",
@@ -354,31 +244,89 @@
             "recipientKeyIndex",
             "accountReference"
         ],
+        "indices": [
+            {
+                "name": "ownerIdUserIdAndAccountRef",
+                "properties": [
+                    {
+                        "$ownerId": "asc"
+                    },
+                    {
+                        "toUserId": "asc"
+                    },
+                    {
+                        "accountReference": "asc"
+                    }
+                ],
+                "unique": true
+            },
+            {
+                "name": "ownerIdUserId",
+                "properties": [
+                    {
+                        "$ownerId": "asc"
+                    },
+                    {
+                        "toUserId": "asc"
+                    }
+                ]
+            },
+            {
+                "name": "userIdCreatedAt",
+                "properties": [
+                    {
+                        "toUserId": "asc"
+                    },
+                    {
+                        "$createdAt": "asc"
+                    }
+                ]
+            },
+            {
+                "name": "ownerIdCreatedAt",
+                "properties": [
+                    {
+                        "$ownerId": "asc"
+                    },
+                    {
+                        "$createdAt": "asc"
+                    }
+                ]
+            }
+        ],
         "additionalProperties": false
     },
-    "mymedia": {
+    "media": {
         "type": "object",
         "$comment": "Allows for the embedded storage of collectible media.",
         "properties": {
             "title": {
                 "type": "string",
                 "position": 0,
-                "maxLength": 63
+                "maxLength": 100
             },
             "size": {
-                "type": "string",
+                "type": "integer",
                 "position": 1
             },
             "payload": {
                 "type": "array",
-                "maxItems": 1000,
-                "minItems": 1,
                 "position": 2,
+                "minItems": 1,
+                "maxItems": 5120,
                 "byteArray": true,
                 "description": "The binary representation of the media data."
             }
         },
         "indices": [
+            {
+                "name": "idx_ownerid",
+                "properties": [
+                    {
+                        "$ownerId": "asc"
+                    }
+                ]
+            },
             {
                 "name": "idx_title",
                 "unique": false,
