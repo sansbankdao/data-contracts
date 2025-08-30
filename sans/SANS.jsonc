@@ -54,8 +54,8 @@
           "en": {
             "$format_version": "0",
             "shouldCapitalize": true,
-            "singularForm": "sansbuck",
-            "pluralForm": "sansbucks"
+            "singularForm": "SANS",
+            "pluralForm": "SANS"
           }
         },
         "decimals": 8
@@ -69,8 +69,8 @@
           "self_changing_admin_action_takers_allowed": false
         }
       },
-      "baseSupply": 1000000,
-      "maxSupply": 10000000,
+      "baseSupply": 2100000000000000,
+      "maxSupply": 2100000000000000,
       "keepsHistory": {
         "$format_version": "0",
         "keepsTransferHistory": true,
@@ -84,7 +84,7 @@
       "allowTransferToFrozenBalance": true,
       "maxSupplyChangeRules": {
         "V0": {
-          "authorized_to_make_change": "ContractOwner",
+          "authorized_to_make_change": "NoOne",
           "admin_action_takers": "NoOne",
           "changing_authorized_action_takers_to_no_one_allowed": false,
           "changing_admin_action_takers_to_no_one_allowed": false,
@@ -104,20 +104,20 @@
           }
         },
         "preProgrammedDistribution": null,
-        "newTokensDestinationIdentity": null,
+        "newTokensDestinationIdentity": "3sL6q6eVCR6y8Ld6Gr14cedhJWNBPmBp3S5VtRcckxzE",
         "newTokensDestinationIdentityRules": {
           "V0": {
-            "authorized_to_make_change": "ContractOwner",
+            "authorized_to_make_change": "NoOne",
             "admin_action_takers": "NoOne",
             "changing_authorized_action_takers_to_no_one_allowed": false,
             "changing_admin_action_takers_to_no_one_allowed": false,
             "self_changing_admin_action_takers_allowed": false
           }
         },
-        "mintingAllowChoosingDestination": true,
+        "mintingAllowChoosingDestination": false,
         "mintingAllowChoosingDestinationRules": {
           "V0": {
-            "authorized_to_make_change": "ContractOwner",
+            "authorized_to_make_change": "NoOne",
             "admin_action_takers": "NoOne",
             "changing_authorized_action_takers_to_no_one_allowed": false,
             "changing_admin_action_takers_to_no_one_allowed": false,
@@ -126,7 +126,20 @@
         },
         "changeDirectPurchasePricingRules": {
           "V0": {
-            "authorized_to_make_change": "ContractOwner",
+            "authorized_to_make_change": "NoOne",
+            "admin_action_takers": "NoOne",
+            "changing_authorized_action_takers_to_no_one_allowed": false,
+            "changing_admin_action_takers_to_no_one_allowed": false,
+            "self_changing_admin_action_takers_allowed": false
+          }
+        }
+      },
+      "marketplaceRules": {
+        "$format_version": "0",
+        "tradeMode": "NotTradeable",
+        "tradeModeChangeRules": {
+          "V0": {
+            "authorized_to_make_change": "NoOne",
             "admin_action_takers": "NoOne",
             "changing_authorized_action_takers_to_no_one_allowed": false,
             "changing_admin_action_takers_to_no_one_allowed": false,
@@ -136,7 +149,7 @@
       },
       "manualMintingRules": {
         "V0": {
-          "authorized_to_make_change": "ContractOwner",
+          "authorized_to_make_change": "NoOne",
           "admin_action_takers": "NoOne",
           "changing_authorized_action_takers_to_no_one_allowed": false,
           "changing_admin_action_takers_to_no_one_allowed": false,
@@ -145,7 +158,7 @@
       },
       "manualBurningRules": {
         "V0": {
-          "authorized_to_make_change": "ContractOwner",
+          "authorized_to_make_change": "NoOne",
           "admin_action_takers": "NoOne",
           "changing_authorized_action_takers_to_no_one_allowed": false,
           "changing_admin_action_takers_to_no_one_allowed": false,
@@ -190,7 +203,13 @@
       },
       "mainControlGroup": null,
       "mainControlGroupCanBeModified": "NoOne",
-      "description": "Reward token for customer loyalty program"
+      "description": "Sansnote (SANS), a governance and utility token serving as the backbone of the Sansbank community."
     }
-  }
+  },
+  "keywords": [
+    "dash",
+    "evo",
+    "dao"
+  ],
+  "description": "Sansnote (SANS), a governance and utility token serving as the backbone of the Sansbank community."
 }
