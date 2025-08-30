@@ -1,4 +1,4 @@
-s/*******************************************************************************
+/*******************************************************************************
  * Copyright (c) 2025 Sansbank DAO
  * Released under the MIT License.
  *
@@ -10,13 +10,13 @@ s/******************************************************************************
  * This data contract consists of FIVE (5) document schemas:
  *   1. Item
  *   2. Creator
- *   3. Media
- *   4. Collection
+ *   3. Collection
+ *   4. Media
  *   5. License
  *
  * PLEASE NOTE:
  * In the event that the collectible is "destroyed", the remainder of its
- * MEDIA (50yr data storage) escrow will be refunded to the current owner.
+ * MEDIA (50yr data storage) escrow will be refunded to its current holder.
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -31,6 +31,7 @@ s/******************************************************************************
  */
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://sansbank.org/schemas/EvoCollectible.jsonc",
     "item": {
         "type": "object",
         "$comment": "A piece of digital media.",
@@ -182,6 +183,51 @@ s/******************************************************************************
         ],
         "additionalProperties": false
     },
+    "media": {
+        "type": "object",
+        "$comment": "Allows for the embedded storage of collectible media.",
+        "properties": {
+            "title": {
+                "type": "string",
+                "position": 0,
+                "maxLength": 100
+            },
+            "size": {
+                "type": "integer",
+                "position": 1
+            },
+            "payload": {
+                "type": "array",
+                "position": 2,
+                "minItems": 1,
+                "maxItems": 5120,
+                "byteArray": true,
+                "description": "The binary representation of the media data."
+            }
+        },
+        "indices": [
+            {
+                "name": "idx_ownerid",
+                "properties": [
+                    {
+                        "$ownerId": "asc"
+                    }
+                ]
+            },
+            {
+                "name": "idx_title",
+                "unique": false,
+                "properties": [
+                    {
+                        "title": "asc"
+                    }
+                ]
+            }
+        ],
+        "canBeDeleted": true,
+        "documentsMutable": false,
+        "additionalProperties": false
+    },
     "license": {
         "type": "object",
         "$comment": "Allows for licensing Creator content.",
@@ -294,51 +340,6 @@ s/******************************************************************************
                 ]
             }
         ],
-        "additionalProperties": false
-    },
-    "media": {
-        "type": "object",
-        "$comment": "Allows for the embedded storage of collectible media.",
-        "properties": {
-            "title": {
-                "type": "string",
-                "position": 0,
-                "maxLength": 100
-            },
-            "size": {
-                "type": "integer",
-                "position": 1
-            },
-            "payload": {
-                "type": "array",
-                "position": 2,
-                "minItems": 1,
-                "maxItems": 5120,
-                "byteArray": true,
-                "description": "The binary representation of the media data."
-            }
-        },
-        "indices": [
-            {
-                "name": "idx_ownerid",
-                "properties": [
-                    {
-                        "$ownerId": "asc"
-                    }
-                ]
-            },
-            {
-                "name": "idx_title",
-                "unique": false,
-                "properties": [
-                    {
-                        "title": "asc"
-                    }
-                ]
-            }
-        ],
-        "canBeDeleted": true,
-        "documentsMutable": false,
         "additionalProperties": false
     }
 }
