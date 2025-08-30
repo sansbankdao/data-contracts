@@ -166,13 +166,13 @@
                 "position": 0,
                 "type": "string",
                 "minLength": 1,
-                "maxLength": 100
+                "maxLength": 63
             },
             "about": {
                 "position": 1,
                 "type": "string",
                 "minLength": 1,
-                "maxLength": 2500
+                "maxLength": 3000
             }
         },
         "required": [
@@ -188,7 +188,7 @@
             "title": {
                 "type": "string",
                 "position": 0,
-                "maxLength": 100
+                "maxLength": 63
             },
             "size": {
                 "type": "integer",
@@ -231,8 +231,8 @@
         "$comment": "Allows for licensing Creator content.",
         "documentsMutable": false,
         "canBeDeleted": false,
-        "requiresIdentityEncryptionBoundedKey": null,
-        "requiresIdentityDecryptionBoundedKey": null,
+        "requiresIdentityEncryptionBoundedKey": 0,
+        "requiresIdentityDecryptionBoundedKey": 0,
         "properties": {
             "toUserId": {
                 "type": "array",
