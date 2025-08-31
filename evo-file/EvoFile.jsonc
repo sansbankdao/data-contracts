@@ -2,7 +2,7 @@
  * Copyright (c) 2025 Sansbank DAO
  * Released under the MIT License.
  *
- * Evolution Collectible
+ * Evolution File
  *
  * A self-contained non-fungible token (NFT) with all of its data and
  * metadata held within the data contract.
@@ -25,8 +25,7 @@
  * Namespace   : TBD
  *
  * For more information, please visit the following resources:
- * - https://dashswap.xyz/launcher
- * - https://sansbank.org
+ * - https://sansbank.org/contracts
  *
  */
 {
