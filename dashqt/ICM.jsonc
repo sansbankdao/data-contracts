@@ -1,5 +1,5 @@
 {
-  "profile": {
+  "sender": {
     "type": "object",
     "indices": [
       {
@@ -81,7 +81,7 @@
     },
     "additionalProperties": false
   },
-  "contactInfo": {
+  "receiver": {
     "type": "object",
     "indices": [
       {
@@ -148,7 +148,7 @@
     },
     "additionalProperties": false
   },
-  "contactRequest": {
+  "message": {
     "type": "object",
     "indices": [
       {
