@@ -1,17 +1,17 @@
 {
-  "sender": {
-    "type": "object",
-    "indices": [
-      {
-        "name": "ownerId",
-        "unique": true,
-        "properties": [
-          {
-            "$ownerId": "asc"
-          }
-        ]
-      },
-      {
+    "sender": {
+        "type": "object",
+        "indices": [
+            {
+                "name": "ownerId",
+                "unique": true,
+                "properties": [
+                    {
+                        "$ownerId": "asc"
+                    }
+                ]
+            },
+            {
         "name": "ownerIdAndUpdatedAt",
         "properties": [
           {
