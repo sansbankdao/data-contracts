@@ -1,0 +1,300 @@
+/*******************************************************************************
+ * Copyright (c) 2025 Sansbank DAO
+ * Released under the MIT License.
+ *
+ * EvoNext
+ *
+ * The premier Dash Evolution Platform social network.
+ *
+ * PLEASE NOTE:
+ * TBD
+ *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ * Version     : 01
+ * Script Hash : 0x0
+ * Namespace   : TBD
+ *
+ * For more information, please visit the following resources:
+ * - https://evonext.app/contract
+ * - https://sansbank.org/contracts
+ *
+ */
+{
+    "$format_version": "0",
+    "$schema": "https://schema.dash.org/dpp-0-4-0/meta/data-contract",
+    "version": 1,
+    "ownerId": "{{ownerId}}",
+    "documents": {
+        "like": {
+            "type": "object",
+            "description": "A like on a post.",
+            "properties": {
+                "postId": {
+                    "position": 0,
+                    "type": "array",
+                    "description": "ID of the liked post.",
+                    "maxItems": 32,
+                    "minItems": 32,
+                    "byteArray": true,
+                    "contentMediaType": "application/x.dash.dpp.identifier"
+                }
+            },
+            "indices": [
+                {
+                    "name": "postAndOwner",
+                    "unique": true,
+                    "properties": [
+                        {
+                            "postId": "asc"
+                        },
+                        {
+                            "$ownerId": "asc"
+                        }
+                    ]
+                },
+                {
+                    "name": "ownerLikes",
+                    "properties": [
+                        {
+                            "$ownerId": "asc"
+                        },
+                        {
+                            "$createdAt": "asc"
+                        }
+                    ]
+                },
+                {
+                    "name": "postLikes",
+                    "properties": [
+                        {
+                            "postId": "asc"
+                        },
+                        {
+                            "$createdAt": "asc"
+                        }
+                    ]
+                }
+            ],
+            "mutable": false,
+            "required": [
+                "$createdAt",
+                "postId"
+            ],
+            "additionalProperties": false
+        },
+        "post": {
+            "type": "object",
+            "description": "A post (or remix) within the social network.",
+            "properties": {
+                "content": {
+                    "position": 0,
+                    "type": "string",
+                    "description": "Content of a post.",
+                    "maxLength": 500,
+                    "minLength": 1
+                },
+                "remix": {
+                    "position": 1,
+                    "type": "string",
+                    "description": "Remixed (content) of a post.",
+                    "maxLength": 500,
+                    "minLength": 1
+                },
+                "language": {
+                    "position": 2,
+                    "type": "string",
+                    "description": "Language code of the post.",
+                    "pattern": "^[a-z]{2}$",
+                    "maxLength": 2
+                },
+                "replyToPostId": {
+                    "position": 3,
+                    "type": "array",
+                    "description": "ID of the post this is replying to.",
+                    "maxItems": 32,
+                    "minItems": 32,
+                    "byteArray": true,
+                    "contentMediaType": "application/x.dash.dpp.identifier"
+                },
+                "mediaUrl": {
+                    "position": 4,
+                    "type": "array",
+                    "description": "IDs to media data (NOTE: will support for up to 3 IDs per post).",
+                    "maxItems": 32,
+                    "minItems": 32,
+                    "byteArray": true,
+                    "contentMediaType": "application/x.dash.dpp.identifier"
+                },
+                "mentionIds": {
+                    "position": 5,
+                    "type": "array",
+                    "description": "Mentioned user IDs (NOTE: will support for up to 3 IDs per post).",
+                    "maxItems": 32,
+                    "minItems": 32,
+                    "byteArray": true,
+                    "contentMediaType": "application/x.dash.dpp.identifier"
+                },
+                "hashtag": {
+                    "position": 6,
+                    "type": "string",
+                    "description": "A (featured) hashtag for the post.",
+                    "pattern": "^[a-zA-Z0-9_]{1,100}$",
+                    "maxLength": 100
+                },
+                "isSensitive": {
+                    "position": 7,
+                    "type": "boolean",
+                    "description": "A flag for whether a post contains sensitive content."
+                }
+            },
+            "indices": [
+                {
+                    "name": "ownerAndTime",
+                    "properties": [
+                        {
+                            "$ownerId": "asc"
+                        },
+                        {
+                            "$createdAt": "asc"
+                        }
+                    ]
+                },
+                {
+                    "name": "remixToPost",
+                    "properties": [
+                        {
+                            "$ownerId": "asc"
+                        },
+                        {
+                            "$updatedAt": "asc"
+                        }
+                    ]
+                },
+                {
+                    "name": "replyToPost",
+                    "properties": [
+                        {
+                            "replyToPostId": "asc"
+                        },
+                        {
+                            "$createdAt": "asc"
+                        }
+                    ]
+                },
+                {
+                    "name": "timeline",
+                    "properties": [
+                        {
+                            "$createdAt": "asc"
+                        }
+                    ]
+                },
+                {
+                    "name": "language",
+                    "properties": [
+                        {
+                            "language": "asc"
+                        },
+                        {
+                            "$createdAt": "asc"
+                        }
+                    ]
+                },
+                {
+                    "name": "sensitive",
+                    "properties": [
+                        {
+                            "isSensitive": "asc"
+                        },
+                        {
+                            "$createdAt": "asc"
+                        }
+                    ]
+                }
+            ],
+            "required": [
+                "$createdAt",
+                "$updatedAt",
+                "content",
+                "language",
+                "isSensitive"
+            ],
+            "additionalProperties": false
+        },
+        "profile": {
+            "type": "object",
+            "description": "A user's (primary) profile information.",
+            "properties": {
+                "displayName": {
+                    "type": "string",
+                    "position": 0,
+                    "maxLength": 50,
+                    "minLength": 1,
+                    "description": "A user's display (name shown on profile)."
+                },
+                "avatarId": {
+                    "position": 1,
+                    "type": "array",
+                    "description": "Reference to the user's avatar (NFT) document.",
+                    "maxItems": 32,
+                    "minItems": 32,
+                    "byteArray": true,
+                    "contentMediaType": "application/x.dash.dpp.identifier"
+                },
+                "bannerId": {
+                    "position": 2,
+                    "type": "array",
+                    "description": "Reference to the user's banner image document.",
+                    "maxItems": 32,
+                    "minItems": 32,
+                    "byteArray": true,
+                    "contentMediaType": "application/x.dash.dpp.identifier"
+                },
+                "bio": {
+                    "position": 3,
+                    "type": "string",
+                    "description": "Brief biography of a user.",
+                    "maxLength": 160
+                },
+                "location": {
+                    "position": 4,
+                    "type": "string",
+                    "description": "Primary location of a user.",
+                    "maxLength": 50
+                },
+                "website": {
+                    "position": 5,
+                    "type": "string",
+                    "description": "Link to a user's website.",
+                    "pattern": "^https?://.+$",
+                    "maxLength": 100
+                }
+            },
+            "indices": [
+                {
+                    "name": "owner",
+                    "unique": true,
+                    "properties": [
+                        {
+                            "$ownerId": "asc"
+                        }
+                    ]
+                },
+                {
+                    "name": "createdAt",
+                    "properties": [
+                        {
+                            "$createdAt": "asc"
+                        }
+                    ]
+                }
+            ],
+            "required": [
+                "$createdAt",
+                "displayName"
+            ],
+            "additionalProperties": false
+        }
+    }
+}
