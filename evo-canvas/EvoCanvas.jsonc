@@ -1,0 +1,86 @@
+/*******************************************************************************
+ * Copyright (c) 2025 Sansbank DAO
+ * Released under the MIT License.
+ *
+ * Evo Canvas
+ *
+ * A rich-media data structure used to represent and store user interactions
+ * and content, including:
+ *   1. Text
+ *   2. Images
+ *   3. Links
+ *
+ * PLEASE NOTE:
+ * This specification is heavily inspired by Farcaster v1 Frames.
+ *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ * Version     : 01
+ * Script Hash : 0x0
+ * Namespace   : TBD
+ *
+ * For more information, please visit the following resources:
+ * - https://sansbank.org/bootstrap
+ * - https://sansbank.org
+ *
+ */
+{
+    "app": {
+        "type": "object",
+        "indices": [
+            {
+                "name": "ownerId",
+                "properties": [
+                    {
+                        "$ownerId": "asc"
+                    }
+                ],
+                "unique": true
+            }
+        ],
+        "properties": {
+            "name": {
+                "type": "string",
+                "format": "uri",
+                "minLength": 1,
+                "maxLength": 2048,
+                "position": 0
+            },
+            "icon": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 140,
+                "position": 3
+            },
+            "banner": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 25,
+                "position": 4
+            },
+            "tagline": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 25,
+                "position": 4
+            },
+            "summary": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 25,
+                "position": 4
+            },
+            "description": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 25,
+                "position": 4
+            }
+        },
+        "required": [
+            "$createdAt",
+            "$updatedAt"
+        ],
+        "additionalProperties": false
+    }
+}

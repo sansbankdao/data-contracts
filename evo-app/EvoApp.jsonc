@@ -2,9 +2,12 @@
  * Copyright (c) 2025 Sansbank DAO
  * Released under the MIT License.
  *
- * Evo (Mini) App
+ * Evo(Mini)App
  *
- * TBD
+ * EvoApps represent the next evolution in app development, offering a seamless
+ * blend of innovation and efficiency. Unlike traditional MiniApps, EvoApps
+ * leverage the power of Dash Drive, a cutting-edge decentralized hosting
+ * service, to provide unparalleled performance, security, and scalability.
  *
  * PLEASE NOTE:
  * TBD
@@ -21,7 +24,7 @@
  *
  */
 {
-    "contributor": {
+    "app": {
         "type": "object",
         "indices": [
             {
@@ -35,20 +38,105 @@
             }
         ],
         "properties": {
-            "avatarUrl": {
+            "name": {
                 "type": "string",
                 "format": "uri",
                 "minLength": 1,
                 "maxLength": 2048,
                 "position": 0
             },
-            "publicMessage": {
+            "icon": {
                 "type": "string",
                 "minLength": 1,
                 "maxLength": 140,
                 "position": 3
             },
-            "displayName": {
+            "banner": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 25,
+                "position": 4
+            },
+            "tagline": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 25,
+                "position": 4
+            },
+            "summary": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 25,
+                "position": 4
+            },
+            "description": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 25,
+                "position": 4
+            }
+        },
+        "required": [
+            "$createdAt",
+            "$updatedAt"
+        ],
+        "additionalProperties": false
+    },
+    "connection": {
+        "type": "object",
+        "indices": [
+            {
+                "name": "ownerId",
+                "properties": [
+                    {
+                        "$ownerId": "asc"
+                    }
+                ],
+                "unique": true
+            },
+            {
+                "name": "appId",
+                "properties": [
+                    {
+                        "appId": "asc"
+                    }
+                ],
+                "unique": true
+            }
+        ],
+        "properties": {
+            "appId": {
+                "type": "string",
+                "format": "uri",
+                "minLength": 1,
+                "maxLength": 2048,
+                "position": 0
+            },
+            "icon": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 140,
+                "position": 3
+            },
+            "banner": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 25,
+                "position": 4
+            },
+            "tagline": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 25,
+                "position": 4
+            },
+            "summary": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 25,
+                "position": 4
+            },
+            "description": {
                 "type": "string",
                 "minLength": 1,
                 "maxLength": 25,
