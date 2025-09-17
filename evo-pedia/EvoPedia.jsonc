@@ -1,0 +1,93 @@
+/*******************************************************************************
+ * Copyright (c) 2025 Sansbank DAO
+ * Released under the MIT License.
+ *
+ * Evolution Encyclopedia
+ *
+ * EvoPedia is an innovate, Wikipedia-style platform that empowers users to
+ * contribute to and shape a dynamic, evolving encyclopedia of knowledge.
+ *
+ * Built on the principles of decentralization and community-driven content,
+ * EvoPedia allows anyone to add, edit, or modify articles without the need for
+ * permission, fostering a collaborative environment where information is
+ * freely shared and collectively refined.
+ *
+ * PLEASE NOTE:
+ * TBD
+ *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ * Version     : 01
+ * Script Hash : 0x0
+ * Namespace   : TBD
+ *
+ * For more information, please visit the following resources:
+ * - https://sansbank.org
+ *
+ */
+{
+    "article": {
+        "type": "object",
+        "indices": [
+            {
+                "name": "ownerId",
+                "properties": [
+                    {
+                        "$ownerId": "asc"
+                    }
+                ],
+                "unique": true
+            }
+        ],
+        "properties": {
+            "name": {
+                "type": "string",
+                "format": "uri",
+                "minLength": 1,
+                "maxLength": 2048,
+                "position": 0
+            },
+            "icon": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 140,
+                "position": 3
+            },
+            "banner": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 25,
+                "position": 4
+            },
+            "tagline": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 25,
+                "position": 4
+            },
+            "summary": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 25,
+                "position": 4
+            },
+            "description": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 25,
+                "position": 4
+            },
+            "body": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 10000,
+                "position": 5
+            }
+        },
+        "required": [
+            "$createdAt",
+            "$updatedAt"
+        ],
+        "additionalProperties": false
+    }
+}
