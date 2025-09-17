@@ -21,7 +21,7 @@
  *
  */
 {
-    "contributor": {
+    "app": {
         "type": "object",
         "indices": [
             {
@@ -35,20 +35,150 @@
             }
         ],
         "properties": {
-            "avatarUrl": {
+            "name": {
+                "type": "string",
+                "position": 0,
+                "format": "uri",
+                "minLength": 1,
+                "maxLength": 2048
+            },
+            "summary": {
+                "type": "string",
+                "position": 1,
+                "minLength": 1,
+                "maxLength": 25
+            },
+            "description": {
+                "type": "string",
+                "position": 2,
+                "minLength": 1,
+                "maxLength": 25
+            },
+            "url": {
+                "type": "string",
+                "position": 3,
+                "minLength": 1,
+                "maxLength": 25
+            },
+            "icon": {
+                "type": "string",
+                "position": 4,
+                "minLength": 1,
+                "maxLength": 140
+            },
+            "permissions": {
+                "position": 5,
+                "type": "array",
+                "description": "A list of permissions require by the application.",
+                "maxItems": 32,
+                "minItems": 32,
+                "byteArray": false
+            }
+
+        },
+        "required": [
+            "$createdAt",
+            "$updatedAt"
+        ],
+        "additionalProperties": false
+    },
+    "connection": {
+        "type": "object",
+        "indices": [
+            {
+                "name": "ownerId",
+                "properties": [
+                    {
+                        "$ownerId": "asc"
+                    }
+                ],
+                "unique": true
+            },
+            {
+                "name": "appId",
+                "properties": [
+                    {
+                        "appId": "asc"
+                    }
+                ],
+                "unique": true
+            }
+        ],
+        "properties": {
+            "appId": {
                 "type": "string",
                 "format": "uri",
                 "minLength": 1,
                 "maxLength": 2048,
                 "position": 0
             },
-            "publicMessage": {
+            "icon": {
                 "type": "string",
                 "minLength": 1,
                 "maxLength": 140,
                 "position": 3
             },
-            "displayName": {
+            "banner": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 25,
+                "position": 4
+            },
+            "tagline": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 25,
+                "position": 4
+            },
+            "summary": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 25,
+                "position": 4
+            },
+            "description": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 25,
+                "position": 4
+            }
+        },
+        "required": [
+            "$createdAt",
+            "$updatedAt"
+        ],
+        "additionalProperties": false
+    },
+    "user": {
+        "type": "object",
+        "indices": [
+            {
+                "name": "ownerId",
+                "properties": [
+                    {
+                        "$ownerId": "asc"
+                    }
+                ],
+                "unique": true
+            }
+        ],
+        "properties": {
+            "appId": {
+                "position": 0,
+                "type": "array",
+                "description": "ID of the application to set permissions.",
+                "maxItems": 32,
+                "minItems": 32,
+                "byteArray": true,
+                "contentMediaType": "application/x.dash.dpp.identifier"
+            },
+            "expiresAt": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 25,
+                "position": 4
+            },
+            "notes": {
                 "type": "string",
                 "minLength": 1,
                 "maxLength": 25,
