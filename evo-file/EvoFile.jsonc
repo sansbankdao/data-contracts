@@ -4,8 +4,8 @@
  *
  * Evolution File
  *
- * A self-contained non-fungible token (NFT) with all of its data and
- * metadata held within the data contract.
+ * EvoFiles are self-contained non-fungible token (NFT) with all of its data
+ * and metadata held within the data contract.
  *
  * This data contract consists of FIVE (5) document schemas:
  *   1. Item
