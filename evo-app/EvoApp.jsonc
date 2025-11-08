@@ -10,7 +10,8 @@
  * service, to provide unparalleled performance, security, and scalability.
  *
  * PLEASE NOTE:
- * TBD
+ * This data contract defines the schema for applications (`app`) and their
+ * associated developer profiles (`profile`) within the ecosystem.
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -30,120 +31,108 @@
             {
                 "name": "ownerId",
                 "properties": [
-                    {
-                        "$ownerId": "asc"
-                    }
-                ],
-                "unique": true
+                    { "$ownerId": "asc" }
+                ]
             }
         ],
         "properties": {
             "name": {
                 "type": "string",
-                "format": "uri",
-                "minLength": 1,
-                "maxLength": 2048,
-                "position": 0
-            },
-            "icon": {
-                "type": "string",
-                "minLength": 1,
-                "maxLength": 140,
-                "position": 3
-            },
-            "banner": {
-                "type": "string",
-                "minLength": 1,
-                "maxLength": 25,
-                "position": 4
+                "position": 0,
+                "minLength": 3,
+                "maxLength": 32
             },
             "tagline": {
                 "type": "string",
+                "position": 1,
                 "minLength": 1,
-                "maxLength": 25,
-                "position": 4
+                "maxLength": 80
             },
             "summary": {
                 "type": "string",
+                "position": 2,
                 "minLength": 1,
-                "maxLength": 25,
-                "position": 4
+                "maxLength": 255
             },
             "description": {
                 "type": "string",
+                "position": 3,
                 "minLength": 1,
-                "maxLength": 25,
-                "position": 4
+                "maxLength": 4096
+            },
+            "icon": {
+                "type": "string",
+                "position": 4,
+                "description": "URL to the application icon.",
+                "format": "uri",
+                "minLength": 1,
+                "maxLength": 2048
+            },
+            "banner": {
+                "type": "string",
+                "position": 5,
+                "description": "URL to a promotional banner image.",
+                "format": "uri",
+                "minLength": 1,
+                "maxLength": 2048
             }
         },
         "required": [
+            "name",
+            "summary",
+            "icon",
             "$createdAt",
             "$updatedAt"
         ],
         "additionalProperties": false
     },
-    "connection": {
+    "profile": {
         "type": "object",
         "indices": [
             {
                 "name": "ownerId",
                 "properties": [
-                    {
-                        "$ownerId": "asc"
-                    }
-                ],
-                "unique": true
-            },
-            {
-                "name": "appId",
-                "properties": [
-                    {
-                        "appId": "asc"
-                    }
+                    { "$ownerId": "asc" }
                 ],
                 "unique": true
             }
         ],
         "properties": {
-            "appId": {
+            "displayName": {
                 "type": "string",
+                "position": 0,
+                "minLength": 3,
+                "maxLength": 50
+            },
+            "avatarUrl": {
+                "type": "string",
+                "position": 1,
                 "format": "uri",
                 "minLength": 1,
-                "maxLength": 2048,
-                "position": 0
+                "maxLength": 2048
             },
-            "icon": {
+            "bio": {
                 "type": "string",
+                "position": 2,
                 "minLength": 1,
-                "maxLength": 140,
-                "position": 3
+                "maxLength": 512
             },
-            "banner": {
+            "website": {
                 "type": "string",
+                "position": 3,
+                "format": "uri",
                 "minLength": 1,
-                "maxLength": 25,
-                "position": 4
+                "maxLength": 2048
             },
-            "tagline": {
+            "contactEmail": {
                 "type": "string",
-                "minLength": 1,
-                "maxLength": 25,
-                "position": 4
-            },
-            "summary": {
-                "type": "string",
-                "minLength": 1,
-                "maxLength": 25,
-                "position": 4
-            },
-            "description": {
-                "type": "string",
-                "minLength": 1,
-                "maxLength": 25,
-                "position": 4
+                "position": 4,
+                "format": "email",
+                "maxLength": 254
             }
         },
         "required": [
+            "displayName",
             "$createdAt",
             "$updatedAt"
         ],

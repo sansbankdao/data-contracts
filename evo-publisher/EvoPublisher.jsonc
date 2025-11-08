@@ -38,107 +38,40 @@
         "properties": {
             "name": {
                 "type": "string",
+                "position": 0,
                 "format": "uri",
                 "minLength": 1,
-                "maxLength": 2048,
-                "position": 0
+                "maxLength": 63
             },
             "icon": {
                 "type": "string",
+                "position": 3,
                 "minLength": 1,
-                "maxLength": 140,
-                "position": 3
+                "maxLength": 140
             },
             "banner": {
                 "type": "string",
+                "position": 4,
                 "minLength": 1,
-                "maxLength": 25,
-                "position": 4
+                "maxLength": 25
             },
             "tagline": {
                 "type": "string",
+                "position": 4,
                 "minLength": 1,
-                "maxLength": 25,
-                "position": 4
+                "maxLength": 25
             },
             "summary": {
                 "type": "string",
+                "position": 4,
                 "minLength": 1,
-                "maxLength": 25,
-                "position": 4
+                "maxLength": 25
             },
             "description": {
                 "type": "string",
+                "position": 5,
                 "minLength": 1,
-                "maxLength": 25,
-                "position": 4
-            }
-        },
-        "required": [
-            "$createdAt",
-            "$updatedAt"
-        ],
-        "additionalProperties": false
-    },
-    "connection": {
-        "type": "object",
-        "indices": [
-            {
-                "name": "ownerId",
-                "properties": [
-                    {
-                        "$ownerId": "asc"
-                    }
-                ],
-                "unique": true
-            },
-            {
-                "name": "appId",
-                "properties": [
-                    {
-                        "appId": "asc"
-                    }
-                ],
-                "unique": true
-            }
-        ],
-        "properties": {
-            "appId": {
-                "type": "string",
-                "format": "uri",
-                "minLength": 1,
-                "maxLength": 2048,
-                "position": 0
-            },
-            "icon": {
-                "type": "string",
-                "minLength": 1,
-                "maxLength": 140,
-                "position": 3
-            },
-            "banner": {
-                "type": "string",
-                "minLength": 1,
-                "maxLength": 25,
-                "position": 4
-            },
-            "tagline": {
-                "type": "string",
-                "minLength": 1,
-                "maxLength": 25,
-                "position": 4
-            },
-            "summary": {
-                "type": "string",
-                "minLength": 1,
-                "maxLength": 25,
-                "position": 4
-            },
-            "description": {
-                "type": "string",
-                "minLength": 1,
-                "maxLength": 25,
-                "position": 4
+                "maxLength": 5120
             }
         },
         "required": [
