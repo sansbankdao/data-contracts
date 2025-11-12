@@ -27,127 +27,119 @@
         "indices": [
             {
                 "name": "ownerId",
-                "properties": [
-                    {
-                        "$ownerId": "asc"
-                    }
-                ],
+                "properties": [{ "$ownerId": "asc" }],
+                "unique": true
+            },
+            {
+                "name": "appId",
+                "properties": [{ "appId": "asc" }],
                 "unique": true
             }
         ],
         "properties": {
+            "appId": {
+                "type": "identifier",
+                "position": 0
+            },
             "name": {
                 "type": "string",
-                "position": 0,
+                "position": 1,
                 "format": "uri",
                 "minLength": 1,
                 "maxLength": 2048
             },
             "summary": {
                 "type": "string",
-                "position": 1,
+                "position": 2,
                 "minLength": 1,
-                "maxLength": 25
+                "maxLength": 200
             },
             "description": {
                 "type": "string",
-                "position": 2,
+                "position": 3,
                 "minLength": 1,
-                "maxLength": 25
+                "maxLength": 500
             },
             "url": {
                 "type": "string",
-                "position": 3,
+                "position": 4,
                 "minLength": 1,
-                "maxLength": 25
+                "maxLength": 2048
             },
             "icon": {
                 "type": "string",
-                "position": 4,
-                "minLength": 1,
-                "maxLength": 140
-            },
-            "permissions": {
                 "position": 5,
-                "type": "array",
-                "description": "A list of permissions require by the application.",
-                "maxItems": 32,
-                "minItems": 32,
-                "byteArray": false
+                "minLength": 1,
+                "maxLength": 2048  // Base64 or URI
+            },
+            "requestedPermissions": {
+                "position": 6,
+                "type": "object",
+                "description": "Requested namespaces and methods (WC-inspired)",
+                "properties": {
+                    "namespaces": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                                "chains": { "type": "array", "items": { "type": "string" } },
+                                "methods": { "type": "array", "items": { "type": "string", "enum": ["signTransaction", "viewBalance", "sendTransaction", ...] } },
+                                "accounts": { "type": "array", "items": { "type": "identifier" } },
+                                "events": { "type": "array", "items": { "type": "string" } }
+                            }
+                        }
+                    }
+                }
             }
-
         },
-        "required": [
-            "$createdAt",
-            "$updatedAt"
-        ],
+        "required": ["appId", "$createdAt", "$updatedAt"],
         "additionalProperties": false
     },
-    "connection": {
+    "session": {
         "type": "object",
         "indices": [
             {
                 "name": "ownerId",
-                "properties": [
-                    {
-                        "$ownerId": "asc"
-                    }
-                ],
+                "properties": [{ "$ownerId": "asc" }],
                 "unique": true
             },
             {
                 "name": "appId",
-                "properties": [
-                    {
-                        "appId": "asc"
-                    }
-                ],
+                "properties": [{ "appId": "asc" }],
+                "unique": false  // Multiple sessions per app
+            },
+            {
+                "name": "sessionId",
+                "properties": [{ "sessionId": "asc" }],
                 "unique": true
             }
         ],
         "properties": {
-            "appId": {
+            "sessionId": {
                 "type": "string",
-                "format": "uri",
-                "minLength": 1,
-                "maxLength": 2048,
                 "position": 0
             },
-            "icon": {
-                "type": "string",
-                "minLength": 1,
-                "maxLength": 140,
-                "position": 3
+            "appId": {
+                "type": "identifier",
+                "position": 1
+            },
+            "grantedPermissions": {  // Subset of requested
+                "position": 2,
+                "$ref": "#/app/properties/requestedPermissions"  // Reuse structure
             },
             "banner": {
                 "type": "string",
                 "minLength": 1,
-                "maxLength": 25,
-                "position": 4
+                "maxLength": 2048,
+                "position": 3
             },
-            "tagline": {
+            "expiresAt": {
                 "type": "string",
-                "minLength": 1,
-                "maxLength": 25,
-                "position": 4
-            },
-            "summary": {
-                "type": "string",
-                "minLength": 1,
-                "maxLength": 25,
-                "position": 4
-            },
-            "description": {
-                "type": "string",
-                "minLength": 1,
-                "maxLength": 25,
+                "format": "date-time",
                 "position": 4
             }
         },
-        "required": [
-            "$createdAt",
-            "$updatedAt"
-        ],
+        "required": ["sessionId", "appId", "$createdAt", "$updatedAt"],
         "additionalProperties": false
     },
     "user": {
@@ -155,41 +147,31 @@
         "indices": [
             {
                 "name": "ownerId",
-                "properties": [
-                    {
-                        "$ownerId": "asc"
-                    }
-                ],
+                "properties": [{ "$ownerId": "asc" }],
                 "unique": true
             }
         ],
         "properties": {
-            "appId": {
+            "appIds": {
                 "position": 0,
                 "type": "array",
-                "description": "ID of the application to set permissions.",
-                "maxItems": 32,
-                "minItems": 32,
-                "byteArray": true,
-                "contentMediaType": "application/x.dash.dpp.identifier"
-            },
-            "expiresAt": {
-                "type": "string",
-                "minLength": 1,
-                "maxLength": 25,
-                "position": 4
+                "items": { "type": "identifier" },
+                "maxItems": 100,
+                "minItems": 0
             },
             "notes": {
                 "type": "string",
-                "minLength": 1,
-                "maxLength": 25,
-                "position": 4
+                "minLength": 0,
+                "maxLength": 500,
+                "position": 1
+            },
+            "revoked": {
+                "type": "boolean",
+                "position": 2,
+                "default": false
             }
         },
-        "required": [
-            "$createdAt",
-            "$updatedAt"
-        ],
+        "required": ["$createdAt", "$updatedAt"],
         "additionalProperties": false
     }
 }
