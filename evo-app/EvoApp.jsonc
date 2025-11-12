@@ -36,7 +36,7 @@
             }
         ],
         "properties": {
-            "name": {
+            "title": {
                 "type": "string",
                 "position": 0,
                 "minLength": 3,

@@ -10,6 +10,11 @@
  *   2. Images
  *   3. Links
  *
+ * Blockchain actions include:
+ *   1. swapping
+ *   2. minting
+ *   3. voting
+ *
  * PLEASE NOTE:
  * This specification is heavily inspired by Farcaster v1 Frames.
  *
@@ -25,7 +30,7 @@
  *
  */
 {
-    "app": {
+    "canvas": {
         "type": "object",
         "indices": [
             {
@@ -39,45 +44,95 @@
             }
         ],
         "properties": {
+            // -- Original Display & Identity Properties --
             "name": {
                 "type": "string",
+                "position": 0,
                 "format": "uri",
                 "minLength": 1,
-                "maxLength": 2048,
-                "position": 0
+                "maxLength": 2048
             },
             "icon": {
                 "type": "string",
+                "position": 1,
                 "minLength": 1,
-                "maxLength": 140,
-                "position": 3
+                "maxLength": 140
             },
             "banner": {
                 "type": "string",
+                "position": 2,
                 "minLength": 1,
-                "maxLength": 25,
-                "position": 4
+                "maxLength": 256
             },
             "tagline": {
                 "type": "string",
+                "position": 3,
                 "minLength": 1,
-                "maxLength": 25,
-                "position": 4
+                "maxLength": 140
             },
             "summary": {
                 "type": "string",
+                "position": 4,
                 "minLength": 1,
-                "maxLength": 25,
-                "position": 4
+                "maxLength": 280
             },
             "description": {
                 "type": "string",
+                "position": 5,
                 "minLength": 1,
-                "maxLength": 25,
-                "position": 4
+                "maxLength": 560
+            },
+
+            // -- NEW: Positioned Properties for State and Interactivity --
+            "state": {
+                "type": "object",
+                "position": 6,
+                "description": "Defines the current state of the interactive canvas, controlling which view is rendered.",
+                "properties": {
+                    "screen": {
+                        "type": "string",
+                        "description": "Identifies the current view, e.g., 'initial', 'results', 'error'."
+                    },
+                    "data": {
+                        "type": "object",
+                        "description": "Arbitrary key-value data relevant to the current state, like poll results or user input."
+                    }
+                },
+                "required": ["screen"]
+            },
+            "actions": {
+                "type": "array",
+                "position": 7,
+                "description": "Defines the interactive buttons for the current state of the canvas.",
+                "maxItems": 4,
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "label": {
+                            "type": "string",
+                            "description": "The text displayed on the button."
+                        },
+                        "target": {
+                            "type": "string",
+                            "format": "uri-relative",
+                            "description": "The API endpoint path that will be appended to the postUrl."
+                        }
+                    },
+                    "required": ["label", "target"]
+                }
+            },
+            "postUrl": {
+                "type": "string",
+                "position": 8,
+                "format": "uri-relative",
+                "description": "The base API endpoint for handling all actions from this canvas."
             }
         },
         "required": [
+            "$ownerId",
+            "name",
+            "state",
+            "postUrl",
             "$createdAt",
             "$updatedAt"
         ],
