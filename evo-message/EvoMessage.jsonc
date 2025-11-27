@@ -1,0 +1,297 @@
+/*******************************************************************************
+ * Copyright (c) 2025 Sansbank DAO
+ * Released under the MIT License.
+ *
+ * Evolution Message (EvoMessage)
+ *
+ * EvoMessage is a secure, end-to-end encrypted messaging system implementing
+ * the Double Ratchet algorithm with X3DH key agreement, designed for the
+ * EvoFiles ecosystem.
+ *
+ * This data contract defines the core messaging schemas for secure communication:
+ *   1. preKeyBundle  - Device identity and ephemeral keys for session initiation
+ *   2. message       - Encrypted message payloads with ratchet metadata
+ *   3. messagePart   - Multipart message assembly for large content
+ *
+ * The system provides forward secrecy and post-compromise security through
+ * continuous ratcheting of encryption keys.
+ *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ * Version     : 01
+ * Script Hash : 0x0
+ * Namespace   : TBD
+ *
+ * For more information, please visit the following resources:
+ * - https://sansbank.org/contracts
+ *
+ */
+{
+    "preKeyBundle": {
+        "type": "object",
+        "indices": [
+            {
+                "name": "ownerDevice",
+                "properties": [
+                    {
+                        "$ownerId": "asc"
+                    },
+                    {
+                        "deviceId": "asc"
+                    }
+                ],
+                "unique": true
+            }
+        ],
+        "properties": {
+            "registrationId": {
+                "type": "integer",
+                "description": "Signal-specific installation ID (UInt32)",
+                "minimum": 0
+            },
+            "deviceId": {
+                "type": "integer",
+                "description": "Unique ID for this device (1, 2, 3...)",
+                "minimum": 1
+            },
+            "identityKey": {
+                "type": "array",
+                "description": "Long-term public key (33 bytes)",
+                "items": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 255
+                },
+                "minItems": 33,
+                "maxItems": 33
+            },
+            "signedPreKeyId": {
+                "type": "integer",
+                "description": "ID of the signed prekey",
+                "minimum": 0
+            },
+            "signedPreKey": {
+                "type": "array",
+                "description": "The signed prekey data (33 bytes)",
+                "items": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 255
+                },
+                "minItems": 33,
+                "maxItems": 33
+            },
+            "signedPreKeySignature": {
+                "type": "array",
+                "description": "Signature of the prekey (64 bytes)",
+                "items": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 255
+                },
+                "minItems": 64,
+                "maxItems": 64
+            },
+            "oneTimePreKeys": {
+                "type": "array",
+                "description": "List of ephemeral keys for X3DH (Max 100)",
+                "maxItems": 100,
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "keyId": {
+                            "type": "integer"
+                        },
+                        "key": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 255
+                            },
+                            "minItems": 33,
+                            "maxItems": 33
+                        }
+                    },
+                    "required": [
+                        "keyId",
+                        "key"
+                    ],
+                    "additionalProperties": false
+                }
+            }
+        },
+        "required": [
+            "registrationId",
+            "deviceId",
+            "identityKey",
+            "signedPreKeyId",
+            "signedPreKey",
+            "signedPreKeySignature",
+            "oneTimePreKeys"
+        ],
+        "additionalProperties": false
+    },
+    "message": {
+        "type": "object",
+        "indices": [
+            {
+                "name": "senderRecipientDevice",
+                "properties": [
+                    {
+                        "$ownerId": "asc"
+                    },
+                    {
+                        "recipientDeviceId": "asc"
+                    },
+                    {
+                        "$createdAt": "asc"
+                    }
+                ],
+                "unique": false
+            }
+        ],
+        "properties": {
+            "recipientId": {
+                "type": "array",
+                "description": "Hashed/Encrypted ID of recipient (32 bytes) for local filtering",
+                "items": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 255
+                },
+                "minItems": 32,
+                "maxItems": 32
+            },
+            "recipientDeviceId": {
+                "type": "integer",
+                "description": "The specific device this message is encrypted for"
+            },
+            "senderDeviceId": {
+                "type": "integer",
+                "description": "The device ID of the sender"
+            },
+            "messageType": {
+                "type": "integer",
+                "description": "1 = PreKeyBundle msg (Session Init), 2 = Standard msg"
+            },
+            "contentType": {
+                "type": "string",
+                "description": "text, image, invoice, system",
+                "maxLength": 32
+            },
+            "ratchetPubKey": {
+                "type": "array",
+                "description": "The sender's current ratchet public key (33 bytes)",
+                "items": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 255
+                },
+                "minItems": 33,
+                "maxItems": 33
+            },
+            "counter": {
+                "type": "integer",
+                "description": "Message number in the current chain",
+                "minimum": 0
+            },
+            "previousCounter": {
+                "type": "integer",
+                "description": "Messages in previous chain (for out-of-order handling)",
+                "minimum": 0
+            },
+            "encryptedPayload": {
+                "type": "array",
+                "description": "AES-GCM ciphertext (Max ~14KB to leave room for headers)",
+                "items": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 255
+                },
+                "maxItems": 14000
+            },
+            "isMultipart": {
+                "type": "boolean",
+                "description": "True if content continues in messagePart documents"
+            },
+            "replyToId": {
+                "type": "array",
+                "description": "Optional ID of parent message for threading",
+                "items": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 255
+                },
+                "minItems": 32,
+                "maxItems": 32
+            },
+            "displayHidden": {
+                "type": "boolean",
+                "description": "Soft-delete flag"
+            }
+        },
+        "required": [
+            "recipientId",
+            "recipientDeviceId",
+            "senderDeviceId",
+            "messageType",
+            "ratchetPubKey",
+            "counter",
+            "previousCounter",
+            "encryptedPayload"
+        ],
+        "additionalProperties": false
+    },
+    "messagePart": {
+        "type": "object",
+        "indices": [
+            {
+                "name": "multipartAssembly",
+                "properties": [
+                    {
+                        "parentMessageId": "asc"
+                    },
+                    {
+                        "sequenceIndex": "asc"
+                    }
+                ],
+                "unique": true
+            }
+        ],
+        "properties": {
+            "parentMessageId": {
+                "type": "array",
+                "description": "The $id of the root message document (32 bytes)",
+                "items": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 255
+                },
+                "minItems": 32,
+                "maxItems": 32
+            },
+            "sequenceIndex": {
+                "type": "integer",
+                "description": "The order of this part (1, 2, 3...)",
+                "minimum": 1
+            },
+            "encryptedChunk": {
+                "type": "array",
+                "description": "AES-GCM ciphertext chunk (Max ~15KB)",
+                "items": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 255
+                },
+                "maxItems": 15000
+            }
+        },
+        "required": [
+            "parentMessageId",
+            "sequenceIndex",
+            "encryptedChunk"
+        ],
+        "additionalProperties": false
+    }
+}
