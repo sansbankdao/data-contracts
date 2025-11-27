@@ -64,35 +64,35 @@ The contract defines three document types.
 Stores keys required for X3DH (Asynchronous setup).
 *   **Indices:** Unique index on`[$ownerId, deviceId]`.
 *   **Properties:**
-    *`registrationId` (integer): Signal-specific installation ID.
-    *`deviceId` (integer): Unique ID (1, 2, 3...).
-    *`identityKey` (byteArray): Long-term public key.
-    *`signedPreKey` (byteArray): Signed pre-key data.
-    *`signedPreKeySignature` (byteArray): Signature of the pre-key.
-    *`oneTimePreKeys` (array of objects): Max 100 ephemeral keys.
+    * `registrationId` (integer): Signal-specific installation ID.
+    * `deviceId` (integer): Unique ID (1, 2, 3...).
+    * `identityKey` (byteArray): Long-term public key.
+    * `signedPreKey` (byteArray): Signed pre-key data.
+    * `signedPreKeySignature` (byteArray): Signature of the pre-key.
+    * `oneTimePreKeys` (array of objects): Max 100 ephemeral keys.
 
 ### 2. The Message (`message`)
 A discrete encrypted payload targeted at a *specific* device.
 *   **Indices:**`[$ownerId, recipientDeviceId, $createdAt]` (Compound index for Sender Scanning).
 *   **Properties:**
-    *`recipientId` (byteArray): Hashed/Encrypted ID of recipient (for local verification).
-    *`recipientDeviceId` (integer): The specific device this payload is encrypted for.
-    *`senderDeviceId` (integer): The device ID of the sender.
-    *`messageType` (integer): 1 = Standard, 3 = PreKey (Session Init).
-    *`ratchetPubKey` (byteArray): The sender's current ratchet public key.
-    *`counter` (integer): Symmetric ratchet index.
-    *`previousCounter` (integer): For out-of-order handling.
-    *`encryptedPayload` (byteArray): AES-GCM ciphertext (Max ~14KB).
-    *`isMultipart` (boolean): True if content continues in`messagePart`.
-    *`replyToId` (byteArray): Optional parent ID.
+    * `recipientId` (byteArray): Hashed/Encrypted ID of recipient (for local verification).
+    * `recipientDeviceId` (integer): The specific device this payload is encrypted for.
+    * `senderDeviceId` (integer): The device ID of the sender.
+    * `messageType` (integer): 1 = Standard, 3 = PreKey (Session Init).
+    * `ratchetPubKey` (byteArray): The sender's current ratchet public key.
+    * `counter` (integer): Symmetric ratchet index.
+    * `previousCounter` (integer): For out-of-order handling.
+    * `encryptedPayload` (byteArray): AES-GCM ciphertext (Max ~14KB).
+    * `isMultipart` (boolean): True if content continues in`messagePart`.
+    * `replyToId` (byteArray): Optional parent ID.
 
 ### 3. The Message Part (`messagePart`)
 Used for payloads exceeding the document limit.
 *   **Indices:** Unique index on`[parentMessageId, sequenceIndex]`.
 *   **Properties:**
-    *`parentMessageId` (byteArray): Reference to the root`message`.
-    *`sequenceIndex` (integer): 1, 2, 3...
-    *`encryptedChunk` (byteArray): Partial ciphertext.
+    * `parentMessageId` (byteArray): Reference to the root`message`.
+    * `sequenceIndex` (integer): 1, 2, 3...
+    * `encryptedChunk` (byteArray): Partial ciphertext.
 
 ## Binary Data Encoding
 Dash Platform uses JSON Schema. To ensure strict type safety and storage efficiency, all fields marked as`byteArray` above **MUST** be encoded as an **Array of Integers** (0-255).
@@ -100,7 +100,7 @@ Dash Platform uses JSON Schema. To ensure strict type safety and storage efficie
 *   String encoding (Base64/Hex) is **NOT** permitted for cryptographic fields.
 
 ## Multi-Device Routing
-EvoMessage treats every Device as a separate cryptographic endpoint (Option B).
+EvoMessage treats every Device as a separate cryptographic endpoint.
 *   **Sending:** If Alice wants to message Bob (who has Device 1 and Device 2), Alice's client MUST encrypt the payload twice (once for Session A->B1, once for Session A->B2).
 *   **Submission:** Alice submits a Batch Transition containing **two** distinct`message` documents.
     *   Doc 1:`recipientDeviceId: 1`
@@ -127,7 +127,7 @@ For payloads >14KB:
 ### Why the "Gatekeeper" Model?
 Allowing strangers to send encrypted messages directly via EvoMessage would require a public index of Recipients (`toUserId`). This would leak the social graph (metadata) to the entire network. By relying on DashPay Contact Requests as the "Gatekeeper," we utilize an existing anti-spam mechanism where the Recipient ID is public *only* for the initial handshake. Once contact is established, EvoMessage takes over using "Sender Scanning" (Querying by`$ownerId`), ensuring metadata privacy for the actual conversation.
 
-### Why Multi-Device (Option B)?
+### Why Multi-Device?
 Modern users expect seamless transition between mobile and desktop. Treating Identity as a single device forces a "log out/wipe keys" workflow when switching devices, which destroys message history. By implementing distinct`deviceId` routing, we allow independent cryptographic sessions, ensuring robust history synchronization across all user devices.
 
 ### Why Sender Pays?
