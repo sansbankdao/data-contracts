@@ -1,0 +1,195 @@
+/*******************************************************************************
+ * Copyright (c) 2025 Sansbank DAO
+ * Released under the MIT License.
+ *
+ * Evolution Staking (EvoStake)
+ *
+ * The Evolution Staking Data Contract manages token staking lifecycle through
+ * coordinated escrow intent and position documents that track deposits, fees,
+ * unlock periods, and payout processing.
+ *
+ * The contract defines a two-document system for managing staking positions:
+ *
+ *   1. escrow_intent - Initial staking request document
+ *     - Records token deposits and staking fees with unique txID constraints
+ *     - Tracks staking lifecycle status:
+ *         - DEPOSITED
+ *         - REQUEST_WITHDRAWAL
+ *         - CLOSED
+ *     - Links to specific purposes via`purposeId`
+ *
+ *   2. escrow_position - Active staking position document
+ *     - References the original staking intent via`stakingId`
+ *     - Records confirmed staked amount and unlock timestamps
+ *     - Manages payout processing states:
+ *         - ACTIVE
+ *         - REJECTED/PROCESSED
+ *     - Tracks payout transactions upon completion
+ *
+ * IMPORTANT NOTE:
+ * The contract ensures data integrity through multiple unique indices on
+ * transaction IDs and supports efficient querying via indexed fields for
+ * owner, status, and processing states.
+ *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ * Version     : 01
+ * Script Hash : 0x0
+ * Namespace   : TBD
+ *
+ * For more information, please visit the following resources:
+ * - https://sansbank.org/contracts
+ *
+ */
+{
+    "escrow_intent": {
+        "type": "object",
+        "indices": [
+            {
+                "name": "owner_idx",
+                "properties": [
+                    {
+                        "$ownerId": "asc"
+                    }
+                ]
+            },
+            {
+                "name": "deposit_unique_idx",
+                "properties": [
+                    {
+                        "tokenDepositTxId": "asc"
+                    }
+                ],
+                "unique": true
+            },
+            {
+                "name": "fee_unique_idx",
+                "properties": [
+                    {
+                        "stakingFeeTxId": "asc"
+                    }
+                ],
+                "unique": true
+            },
+            {
+                "name": "status_idx",
+                "properties": [
+                    {
+                        "status": "asc"
+                    }
+                ]
+            }
+        ],
+        "properties": {
+            "purposeId": {
+                "type": "string",
+                "maxLength": 32,
+                "position": 0
+            },
+            "tokenDepositTxId": {
+                "type": "string",
+                "minLength": 40,
+                "position": 1
+            },
+            "stakeAmount": {
+                "type": "number",
+                "position": 2
+            },
+            "stakingFeeTxId": {
+                "type": "string",
+                "minLength": 40,
+                "position": 3
+            },
+            "status": {
+                "type": "string",
+                "enum": [
+                    "DEPOSITED",
+                    "REQUEST_WITHDRAWAL",
+                    "CLOSED"
+                ],
+                "position": 4
+            }
+        },
+        "required": [
+            "purposeId",
+            "tokenDepositTxId",
+            "stakeAmount",
+            "stakingFeeTxId",
+            "status"
+        ],
+        "additionalProperties": false
+    },
+    "escrow_position": {
+        "type": "object",
+        "indices": [
+            {
+                "name": "staking_link_idx",
+                "properties": [
+                    {
+                        "stakingId": "asc"
+                    }
+                ],
+                "unique": true
+            },
+            {
+                "name": "payout_unique_idx",
+                "properties": [
+                    {
+                        "payoutTxId": "asc"
+                    }
+                ],
+                "unique": true
+            },
+            {
+                "name": "processing_idx",
+                "properties": [
+                    {
+                        "processingState": "asc"
+                    }
+                ]
+            }
+        ],
+        "properties": {
+            "stakingId": {
+                "type": "string",
+                "description": "The Document ID of the associated escrow_intent",
+                "position": 0
+            },
+            "stakerId": {
+                "type": "string",
+                "description": "The Identity ID of the user",
+                "position": 1
+            },
+            "confirmedAmount": {
+                "type": "number",
+                "position": 2
+            },
+            "unlockTimeMs": {
+                "type": "integer",
+                "position": 3
+            },
+            "processingState": {
+                "type": "string",
+                "enum": [
+                    "ACTIVE",
+                    "REJECTED",
+                    "PROCESSED"
+                ],
+                "position": 4
+            },
+            "payoutTxId": {
+                "type": "string",
+                "minLength": 40,
+                "position": 5
+            }
+        },
+        "required": [
+            "stakingId",
+            "stakerId",
+            "confirmedAmount",
+            "unlockTimeMs",
+            "processingState"
+        ],
+        "additionalProperties": false
+    }
+}
