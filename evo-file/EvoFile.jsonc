@@ -2,38 +2,36 @@
  * Copyright (c) 2025 Sansbank DAO
  * Released under the MIT License.
  *
- * FileVault Data Contract
+ * EvoFile Data Contract
  *
- * This contract provides a decentralized file system for the Dash Platform,
- * allowing users to manage hierarchical file structures with embedded media
- * storage. It supports:
- * - Hierarchical file/folder organization
- * - File versioning and metadata tracking
- * - Embedded media storage up to 20KB per document
- * - File sharing and access control through Dash Platform signatures
+ * EvoFiles are a decentralized file management system for the Dash Platform,
+ * providing hierarchical organization with embedded media storage capabilities.
+ * Each EvoFile can contain metadata, encryption information, and links to
+ * media documents for file content.
  *
- * The contract consists of TWO (2) document schemas:
- *   1. Folder - Master document for organizing and managing media files
- *   2. Media  - Embedded media storage with version control
+ * This data contract consists of TWO (2) document schemas:
+ *   1. EvoManifest - Master controller document that organizes and manages
+ *                    one or more media documents that make up a complete file
+ *   2. Media - Embedded media storage (up to 20KB per document)
  *
  * PLEASE NOTE:
  * In the event that the file data is "destroyed", the remainder of its
  * MEDIA (50yr data storage) escrow will be refunded to its current holder.
  *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  * Version     : 01
  * Script Hash : 0x0
- * Namespace   : FileVault
+ * Namespace   : EvoFile
  *
  * For more information, please visit the following resources:
  * - https://sansbank.org/contracts
  *
  */
 {
-    "folder": {
+    "evoManifest": {
         "type": "object",
-        "$comment": "Master document for organizing files and folders in a hierarchical structure.",
+        "$comment": "Master controller document for organizing files and managing their associated media documents.",
         "properties": {
             "name": {
                 "type": "string",
@@ -47,7 +45,7 @@
                 "maxLength": 31,
                 "description": "Type identifier: 'folder', 'document', 'image', 'audio', 'video', etc."
             },
-            "parentFolderId": {
+            "parentId": {
                 "type": "string",
                 "pattern": "^[A-Za-z0-9+/=]{44}$",
                 "position": 2,
@@ -78,61 +76,42 @@
                 "maxItems": 1000,
                 "items": {
                     "type": "string",
-                    "pattern": "^[A-Za-z0-9+/=]{44}$"
+                    "format": "application/x.dash.dpp.identifier"
                 },
-                "description": "Array of document IDs for media content (for files with embedded media)"
-            },
-            "version": {
-                "type": "integer",
-                "position": 6,
-                "minimum": 1,
-                "description": "Version number of the folder/document"
-            },
-            "previousVersionId": {
-                "type": "string",
-                "pattern": "^[A-Za-z0-9+/=]{44}$",
-                "position": 7,
-                "maxLength": 44,
-                "description": "Document ID of the previous version (for version history)"
+                "description": "Array of document IDs for media content that make up this file"
             },
             "createdAt": {
                 "type": "integer",
-                "position": 8,
+                "position": 6,
                 "minimum": 0,
                 "description": "Unix timestamp of creation"
             },
             "updatedAt": {
                 "type": "integer",
-                "position": 9,
+                "position": 7,
                 "minimum": 0,
                 "description": "Unix timestamp of last update"
             },
             "fileSize": {
                 "type": "integer",
-                "position": 10,
+                "position": 8,
                 "minimum": 0,
                 "description": "Total file size in bytes (0 for folders)"
             },
             "mimeType": {
                 "type": "string",
-                "position": 11,
+                "position": 9,
                 "maxLength": 127,
                 "description": "MIME type of the file (e.g., 'image/jpeg', 'text/plain')"
             },
-            "isPublic": {
-                "type": "boolean",
-                "position": 12,
-                "description": "Whether the file/folder is publicly accessible"
-            },
-            "encryptionKeyHash": {
+            "encryptionScheme": {
                 "type": "string",
-                "position": 13,
-                "pattern": "^[A-Za-z0-9+/=]{44}$",
-                "maxLength": 44,
-                "description": "Hash of the encryption key used for end-to-end encrypted files (optional)"
+                "position": 10,
+                "maxLength": 31,
+                "description": "Encryption scheme used for the file (e.g., 'none', 'aes-256-gcm')"
             }
         },
-        "required": ["name", "type", "version", "createdAt", "updatedAt"],
+        "required": ["name", "type", "createdAt", "updatedAt"],
         "indices": [
             {
                 "name": "idx_ownerid",
@@ -146,7 +125,7 @@
                 "name": "idx_parent_owner",
                 "properties": [
                     {
-                        "parentFolderId": "asc"
+                        "parentId": "asc"
                     },
                     {
                         "$ownerId": "asc"
@@ -196,14 +175,14 @@
     },
     "media": {
         "type": "object",
-        "$comment": "Embedded media storage with version control and chunking support.",
+        "$comment": "Embedded media storage with chunking support for large files.",
         "properties": {
-            "folderDocumentId": {
+            "parentId": {
                 "type": "string",
                 "pattern": "^[A-Za-z0-9+/=]{44}$",
                 "position": 0,
                 "maxLength": 44,
-                "description": "Document ID of the parent folder/master document"
+                "description": "Document ID of the master evoManifest document"
             },
             "title": {
                 "type": "string",
@@ -235,15 +214,9 @@
                 "minimum": 0,
                 "description": "Total size of the complete media file in bytes"
             },
-            "version": {
-                "type": "integer",
-                "position": 6,
-                "minimum": 1,
-                "description": "Version number of this media chunk"
-            },
             "payload1": {
                 "type": "array",
-                "position": 7,
+                "position": 6,
                 "minItems": 1,
                 "maxItems": 5120,
                 "byteArray": true,
@@ -251,7 +224,7 @@
             },
             "payload2": {
                 "type": "array",
-                "position": 8,
+                "position": 7,
                 "minItems": 1,
                 "maxItems": 5120,
                 "byteArray": true,
@@ -259,7 +232,7 @@
             },
             "payload3": {
                 "type": "array",
-                "position": 9,
+                "position": 8,
                 "minItems": 1,
                 "maxItems": 5120,
                 "byteArray": true,
@@ -267,7 +240,7 @@
             },
             "payload4": {
                 "type": "array",
-                "position": 10,
+                "position": 9,
                 "minItems": 1,
                 "maxItems": 5120,
                 "byteArray": true,
@@ -275,18 +248,18 @@
             },
             "checksum": {
                 "type": "string",
-                "position": 11,
+                "position": 10,
                 "maxLength": 88,
                 "description": "Checksum/hash of the payload for integrity verification"
             },
             "createdAt": {
                 "type": "integer",
-                "position": 12,
+                "position": 11,
                 "minimum": 0,
                 "description": "Unix timestamp when this chunk was created"
             }
         },
-        "required": ["folderDocumentId", "title", "chunkIndex", "totalChunks", "size", "version", "createdAt"],
+        "required": ["parentId", "title", "chunkIndex", "totalChunks", "size", "createdAt"],
         "indices": [
             {
                 "name": "idx_ownerid",
@@ -297,10 +270,10 @@
                 ]
             },
             {
-                "name": "idx_folder_chunk",
+                "name": "idx_parent_chunk",
                 "properties": [
                     {
-                        "folderDocumentId": "asc"
+                        "parentId": "asc"
                     },
                     {
                         "chunkIndex": "asc"
@@ -308,16 +281,13 @@
                 ]
             },
             {
-                "name": "idx_folder_version",
+                "name": "idx_parent_updated",
                 "properties": [
                     {
-                        "folderDocumentId": "asc"
+                        "parentId": "asc"
                     },
                     {
-                        "version": "desc"
-                    },
-                    {
-                        "chunkIndex": "asc"
+                        "createdAt": "desc"
                     }
                 ]
             }
