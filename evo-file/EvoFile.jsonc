@@ -51,11 +51,13 @@
                 "description": "Type identifier: 'folder', 'document', 'image', 'audio', 'video', etc."
             },
             "parentId": {
-                "type": "string",
+                "type": "array",
                 "position": 2,
-                "maxLength": 44,
-                "pattern": "^[A-Za-z0-9+/=]{44}$",
-                "description": "Document ID of the parent manifest (folder). Omit for root items."
+                "maxItems": 32,
+                "minItems": 32,
+                "byteArray": true,
+                "description": "Document ID of the parent manifest (folder). Omit for root items.",
+                "contentMediaType": "application/x.dash.dpp.identifier"
             },
             "description": {
                 "type": "string",
@@ -122,35 +124,24 @@
                 "minimum": 0,
                 "description": "Nominal max chunk size in bytes per media document. Recommended value: 20480."
             },
-            "mediaDocumentIds": {
+            "mediaIds": {
                 "type": "array",
                 "position": 13,
                 "minItems": 0,
                 "maxItems": 1000,
                 "items": {
-                    "type": "string",
-                    "format": "application/x.dash.dpp.identifier"
+                    "type": "array",
+                    "maxItems": 32,
+                    "minItems": 32,
+                    "byteArray": true,
+                    "contentMediaType": "application/x.dash.dpp.identifier"
                 },
                 "description": "Optional ordered list of media document IDs. Clients may also reconstruct by querying media by parentId and chunkIndex."
-            },
-            "createdAt": {
-                "type": "integer",
-                "position": 14,
-                "minimum": 0,
-                "description": "Unix timestamp of creation"
-            },
-            "updatedAt": {
-                "type": "integer",
-                "position": 15,
-                "minimum": 0,
-                "description": "Unix timestamp of last update"
             }
         },
         "required": [
             "name",
-            "type",
-            "createdAt",
-            "updatedAt"
+            "type"
         ],
         "indices": [
             {
@@ -201,7 +192,7 @@
                 "unique": false,
                 "properties": [
                     {
-                        "updatedAt": "desc"
+                        "$updatedAt": "desc"
                     },
                     {
                         "$ownerId": "asc"
@@ -218,11 +209,13 @@
         "$comment": "Embedded media storage. Each media document stores up to 20KB across 4 payload arrays (5120 bytes each). Multiple documents can be chained via chunkIndex.",
         "properties": {
             "parentId": {
-                "type": "string",
+                "type": "array",
                 "position": 0,
-                "maxLength": 44,
-                "pattern": "^[A-Za-z0-9+/=]{44}$",
-                "description": "Document ID of the parent manifest document"
+                "maxItems": 32,
+                "minItems": 32,
+                "byteArray": true,
+                "description": "Document ID of the parent manifest document",
+                "contentMediaType": "application/x.dash.dpp.identifier"
             },
             "chunkIndex": {
                 "type": "integer",
@@ -291,12 +284,6 @@
                 "maxItems": 5120,
                 "byteArray": true,
                 "description": "Binary representation of media data."
-            },
-            "createdAt": {
-                "type": "integer",
-                "position": 11,
-                "minimum": 0,
-                "description": "Unix timestamp when this chunk was created"
             }
         },
         "required": [
@@ -304,8 +291,7 @@
             "chunkIndex",
             "totalChunks",
             "size",
-            "payload1",
-            "createdAt"
+            "payload1"
         ],
         "indices": [
             {
@@ -335,7 +321,7 @@
                         "parentId": "asc"
                     },
                     {
-                        "createdAt": "desc"
+                        "$createdAt": "desc"
                     }
                 ]
             }
