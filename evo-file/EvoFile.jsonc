@@ -2,230 +2,137 @@
  * Copyright (c) 2025 Sansbank DAO
  * Released under the MIT License.
  *
- * Evolution File
+ * FileVault Data Contract
  *
- * EvoFiles are self-contained non-fungible token (NFT) with all of its data
- * and metadata held within the data contract.
+ * This contract provides a decentralized file system for the Dash Platform,
+ * allowing users to manage hierarchical file structures with embedded media
+ * storage. It supports:
+ * - Hierarchical file/folder organization
+ * - File versioning and metadata tracking
+ * - Embedded media storage up to 20KB per document
+ * - File sharing and access control through Dash Platform signatures
  *
- * This data contract consists of FIVE (5) document schemas:
- *   1. Item
- *   2. Creator
- *   3. Collection
- *   4. Media
- *   5. License
+ * The contract consists of TWO (2) document schemas:
+ *   1. Folder - Master document for organizing and managing media files
+ *   2. Media  - Embedded media storage with version control
  *
  * PLEASE NOTE:
- * In the event that the collectible is "destroyed", the remainder of its
+ * In the event that the file data is "destroyed", the remainder of its
  * MEDIA (50yr data storage) escrow will be refunded to its current holder.
  *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  * Version     : 01
  * Script Hash : 0x0
- * Namespace   : TBD
+ * Namespace   : FileVault
  *
  * For more information, please visit the following resources:
  * - https://sansbank.org/contracts
  *
  */
 {
-    "item": {
+    "folder": {
         "type": "object",
-        "$comment": "A piece of digital media.",
-        "indices": [
-            {
-                "name": "idx_ownerid",
-                "properties": [
-                    {
-                        "$ownerId": "asc"
-                    }
-                ],
-                "unique": true
-            }
-        ],
+        "$comment": "Master document for organizing files and folders in a hierarchical structure.",
         "properties": {
-            "pieces": {
-                "type": "integer",
-                "position": 0
-            },
-            "avatarHash": {
-                "type": "array",
-                "byteArray": true,
-                "minItems": 32,
-                "maxItems": 32,
-                "description": "SHA256 hash of the bytes of the image specified by avatarUrl",
-                "position": 1
-            },
-            "avatarFingerprint": {
-                "type": "array",
-                "byteArray": true,
-                "minItems": 8,
-                "maxItems": 8,
-                "description": "dHash the image specified by avatarUrl",
-                "position": 2
-            },
-            "publicMessage": {
+            "name": {
                 "type": "string",
-                "minLength": 1,
-                "maxLength": 140,
-                "position": 3
-            },
-            "displayName": {
-                "type": "string",
-                "minLength": 1,
-                "maxLength": 25,
-                "position": 4
-            }
-        },
-        "minProperties": 1,
-        "dependentRequired": {
-            "avatarUrl": ["avatarHash", "avatarFingerprint"],
-            "avatarHash": ["avatarUrl", "avatarFingerprint"],
-            "avatarFingerprint": ["avatarUrl", "avatarHash"]
-        },
-        "required": [
-            "$createdAt",
-            "$updatedAt"
-        ],
-        "additionalProperties": false
-    },
-    "creator": {
-        "type": "object",
-        "$comment": "The original Creator of the digital media.",
-        "indices": [
-            {
-                "name": "ownerId",
-                "properties": [
-                    {
-                        "$ownerId": "asc"
-                    }
-                ],
-                "unique": true
-            },
-            {
-                "name": "ownerIdAndUpdatedAt",
-                "properties": [
-                    {
-                        "$ownerId": "asc"
-                    },
-                    {
-                        "$updatedAt": "asc"
-                    }
-                ]
-            }
-        ],
-        "properties": {
-            "avatarUrl": {
                 "position": 0,
-                "type": "string",
-                "format": "uri",
-                "minLength": 1,
-                "maxLength": 2048
+                "maxLength": 127,
+                "description": "Display name of the file or folder"
             },
-            "publicMessage": {
+            "type": {
+                "type": "string",
                 "position": 1,
-                "type": "string",
-                "minLength": 1,
-                "maxLength": 140
+                "maxLength": 31,
+                "description": "Type identifier: 'folder', 'document', 'image', 'audio', 'video', etc."
             },
-            "displayName": {
+            "parentFolderId": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9+/=]{44}$",
                 "position": 2,
-                "type": "string",
-                "minLength": 1,
-                "maxLength": 25
-            }
-        },
-        "minProperties": 1,
-        "dependentRequired": {
-            "avatarUrl": ["avatarHash", "avatarFingerprint"],
-            "avatarHash": ["avatarUrl", "avatarFingerprint"],
-            "avatarFingerprint": ["avatarUrl", "avatarHash"]
-        },
-        "required": [
-            "$createdAt",
-            "$updatedAt"
-        ],
-        "additionalProperties": false
-    },
-    "collection": {
-        "type": "object",
-        "indices": [
-            {
-                "name": "ownerId",
-                "properties": [
-                    {
-                        "$ownerId": "asc"
-                    }
-                ],
-                "unique": true
-            }
-        ],
-        "properties": {
-            "title": {
-                "position": 0,
-                "type": "string",
-                "minLength": 1,
-                "maxLength": 63
+                "maxLength": 44,
+                "description": "Document ID of the parent folder (for hierarchical organization)"
             },
-            "about": {
-                "position": 1,
+            "description": {
                 "type": "string",
-                "minLength": 1,
-                "maxLength": 3000
-            }
-        },
-        "required": [
-            "$createdAt",
-            "$updatedAt"
-        ],
-        "additionalProperties": false
-    },
-    "media": {
-        "type": "object",
-        "$comment": "Allows for the embedded storage of collectible media.",
-        "properties": {
-            "title": {
-                "type": "string",
-                "position": 0,
-                "maxLength": 63
-            },
-            "size": {
-                "type": "integer",
-                "position": 1
-            },
-            "payload1": {
-                "type": "array",
-                "position": 2,
-                "minItems": 1,
-                "maxItems": 5120,
-                "byteArray": true,
-                "description": "The binary representation of the media data."
-            },
-            "payload2": {
-                "type": "array",
                 "position": 3,
-                "minItems": 1,
-                "maxItems": 5120,
-                "byteArray": true,
-                "description": "The binary representation of the media data."
+                "maxLength": 511,
+                "description": "Optional description of the file/folder contents"
             },
-            "payload3": {
+            "tags": {
                 "type": "array",
                 "position": 4,
-                "minItems": 1,
-                "maxItems": 5120,
-                "byteArray": true,
-                "description": "The binary representation of the media data."
+                "minItems": 0,
+                "maxItems": 20,
+                "items": {
+                    "type": "string",
+                    "maxLength": 31
+                },
+                "description": "User-defined tags for categorization and search"
             },
-            "payload4": {
+            "mediaDocumentIds": {
                 "type": "array",
                 "position": 5,
-                "minItems": 1,
-                "maxItems": 5120,
-                "byteArray": true,
-                "description": "The binary representation of the media data."
+                "minItems": 0,
+                "maxItems": 1000,
+                "items": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9+/=]{44}$"
+                },
+                "description": "Array of document IDs for media content (for files with embedded media)"
+            },
+            "version": {
+                "type": "integer",
+                "position": 6,
+                "minimum": 1,
+                "description": "Version number of the folder/document"
+            },
+            "previousVersionId": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9+/=]{44}$",
+                "position": 7,
+                "maxLength": 44,
+                "description": "Document ID of the previous version (for version history)"
+            },
+            "createdAt": {
+                "type": "integer",
+                "position": 8,
+                "minimum": 0,
+                "description": "Unix timestamp of creation"
+            },
+            "updatedAt": {
+                "type": "integer",
+                "position": 9,
+                "minimum": 0,
+                "description": "Unix timestamp of last update"
+            },
+            "fileSize": {
+                "type": "integer",
+                "position": 10,
+                "minimum": 0,
+                "description": "Total file size in bytes (0 for folders)"
+            },
+            "mimeType": {
+                "type": "string",
+                "position": 11,
+                "maxLength": 127,
+                "description": "MIME type of the file (e.g., 'image/jpeg', 'text/plain')"
+            },
+            "isPublic": {
+                "type": "boolean",
+                "position": 12,
+                "description": "Whether the file/folder is publicly accessible"
+            },
+            "encryptionKeyHash": {
+                "type": "string",
+                "position": 13,
+                "pattern": "^[A-Za-z0-9+/=]{44}$",
+                "maxLength": 44,
+                "description": "Hash of the encryption key used for end-to-end encrypted files (optional)"
             }
         },
+        "required": ["name", "type", "version", "createdAt", "updatedAt"],
         "indices": [
             {
                 "name": "idx_ownerid",
@@ -236,11 +143,49 @@
                 ]
             },
             {
-                "name": "idx_title",
+                "name": "idx_parent_owner",
+                "properties": [
+                    {
+                        "parentFolderId": "asc"
+                    },
+                    {
+                        "$ownerId": "asc"
+                    }
+                ]
+            },
+            {
+                "name": "idx_name_owner",
                 "unique": false,
                 "properties": [
                     {
-                        "title": "asc"
+                        "name": "asc"
+                    },
+                    {
+                        "$ownerId": "asc"
+                    }
+                ]
+            },
+            {
+                "name": "idx_type_owner",
+                "unique": false,
+                "properties": [
+                    {
+                        "type": "asc"
+                    },
+                    {
+                        "$ownerId": "asc"
+                    }
+                ]
+            },
+            {
+                "name": "idx_updated",
+                "unique": false,
+                "properties": [
+                    {
+                        "updatedAt": "desc"
+                    },
+                    {
+                        "$ownerId": "asc"
                     }
                 ]
             }
@@ -249,118 +194,136 @@
         "documentsMutable": false,
         "additionalProperties": false
     },
-    "license": {
+    "media": {
         "type": "object",
-        "$comment": "Allows for licensing Creator content.",
-        "documentsMutable": false,
-        "canBeDeleted": false,
-        "requiresIdentityEncryptionBoundedKey": 0,
-        "requiresIdentityDecryptionBoundedKey": 0,
+        "$comment": "Embedded media storage with version control and chunking support.",
         "properties": {
-            "toUserId": {
-                "type": "array",
+            "folderDocumentId": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9+/=]{44}$",
                 "position": 0,
-                "byteArray": true,
-                "minItems": 32,
-                "maxItems": 32,
-                "contentMediaType": "application/x.dash.dpp.identifier"
+                "maxLength": 44,
+                "description": "Document ID of the parent folder/master document"
             },
-            "encryptedPublicKey": {
-                "type": "array",
+            "title": {
+                "type": "string",
                 "position": 1,
-                "byteArray": true,
-                "minItems": 96,
-                "maxItems": 96
+                "maxLength": 127,
+                "description": "Title of the media file (original filename)"
             },
-            "senderKeyIndex": {
+            "chunkIndex": {
                 "type": "integer",
                 "position": 2,
-                "minimum": 0
+                "minimum": 0,
+                "description": "Index of this chunk for multi-chunk files (0-based)"
             },
-            "recipientKeyIndex": {
+            "totalChunks": {
                 "type": "integer",
                 "position": 3,
-                "minimum": 0
+                "minimum": 1,
+                "description": "Total number of chunks for this media file"
             },
-            "accountReference": {
+            "size": {
                 "type": "integer",
                 "position": 4,
-                "minimum": 0
+                "minimum": 0,
+                "description": "Size of this chunk in bytes"
             },
-            "encryptedAccountLabel": {
-                "type": "array",
+            "totalSize": {
+                "type": "integer",
                 "position": 5,
-                "byteArray": true,
-                "minItems": 48,
-                "maxItems": 80
+                "minimum": 0,
+                "description": "Total size of the complete media file in bytes"
             },
-            "autoAcceptProof": {
-                "type": "array",
+            "version": {
+                "type": "integer",
                 "position": 6,
+                "minimum": 1,
+                "description": "Version number of this media chunk"
+            },
+            "payload1": {
+                "type": "array",
+                "position": 7,
+                "minItems": 1,
+                "maxItems": 5120,
                 "byteArray": true,
-                "minItems": 38,
-                "maxItems": 102
+                "description": "Binary representation of media data (chunk 1)"
+            },
+            "payload2": {
+                "type": "array",
+                "position": 8,
+                "minItems": 1,
+                "maxItems": 5120,
+                "byteArray": true,
+                "description": "Binary representation of media data (chunk 2)"
+            },
+            "payload3": {
+                "type": "array",
+                "position": 9,
+                "minItems": 1,
+                "maxItems": 5120,
+                "byteArray": true,
+                "description": "Binary representation of media data (chunk 3)"
+            },
+            "payload4": {
+                "type": "array",
+                "position": 10,
+                "minItems": 1,
+                "maxItems": 5120,
+                "byteArray": true,
+                "description": "Binary representation of media data (chunk 4)"
+            },
+            "checksum": {
+                "type": "string",
+                "position": 11,
+                "maxLength": 88,
+                "description": "Checksum/hash of the payload for integrity verification"
+            },
+            "createdAt": {
+                "type": "integer",
+                "position": 12,
+                "minimum": 0,
+                "description": "Unix timestamp when this chunk was created"
             }
         },
-        "required": [
-            "$createdAt",
-            "$createdAtCoreBlockHeight",
-            "toUserId",
-            "encryptedPublicKey",
-            "senderKeyIndex",
-            "recipientKeyIndex",
-            "accountReference"
-        ],
+        "required": ["folderDocumentId", "title", "chunkIndex", "totalChunks", "size", "version", "createdAt"],
         "indices": [
             {
-                "name": "ownerIdUserIdAndAccountRef",
+                "name": "idx_ownerid",
                 "properties": [
                     {
                         "$ownerId": "asc"
-                    },
-                    {
-                        "toUserId": "asc"
-                    },
-                    {
-                        "accountReference": "asc"
-                    }
-                ],
-                "unique": true
-            },
-            {
-                "name": "ownerIdUserId",
-                "properties": [
-                    {
-                        "$ownerId": "asc"
-                    },
-                    {
-                        "toUserId": "asc"
                     }
                 ]
             },
             {
-                "name": "userIdCreatedAt",
+                "name": "idx_folder_chunk",
                 "properties": [
                     {
-                        "toUserId": "asc"
+                        "folderDocumentId": "asc"
                     },
                     {
-                        "$createdAt": "asc"
+                        "chunkIndex": "asc"
                     }
                 ]
             },
             {
-                "name": "ownerIdCreatedAt",
+                "name": "idx_folder_version",
                 "properties": [
                     {
-                        "$ownerId": "asc"
+                        "folderDocumentId": "asc"
                     },
                     {
-                        "$createdAt": "asc"
+                        "version": "desc"
+                    },
+                    {
+                        "chunkIndex": "asc"
                     }
                 ]
             }
         ],
+        "canBeDeleted": true,
+        "documentsMutable": false,
         "additionalProperties": false
     }
 }
