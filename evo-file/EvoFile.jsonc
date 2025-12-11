@@ -2,17 +2,22 @@
  * Copyright (c) 2025 Sansbank DAO
  * Released under the MIT License.
  *
- * EvoFile Data Contract
+ * Evolution File
  *
- * EvoFiles are a decentralized file management system for the Dash Platform,
- * providing hierarchical organization with embedded media storage capabilities.
- * Each EvoFile can contain metadata, encryption information, and links to
- * media documents for file content.
+ * EvoFiles are a decentralized file system for Dash Platform.
+ *
+ * The purpose of this contract is to:
+ *   - Organize files and folders in a hierarchical structure
+ *   - Store file metadata (name, type, MIME, size, tags)
+ *   - Store file content on-platform as embedded media in 20KB chunks
+ *     (4 payload arrays of up to 5120 bytes each)
+ *   - Provide integrity verification via hashes for both complete files
+ *     and individual chunks
+ *   - Track encryption and compression schemes used by clients
  *
  * This data contract consists of TWO (2) document schemas:
- *   1. EvoManifest - Master controller document that organizes and manages
- *                    one or more media documents that make up a complete file
- *   2. Media - Embedded media storage (up to 20KB per document)
+ *   1. manifest
+ *   2. media
  *
  * PLEASE NOTE:
  * In the event that the file data is "destroyed", the remainder of its
@@ -29,9 +34,9 @@
  *
  */
 {
-    "evoManifest": {
+    "manifest": {
         "type": "object",
-        "$comment": "Master controller document for organizing files and managing their associated media documents.",
+        "$comment": "Master controller for an EvoFile entry (file or folder). For files, it manages one or more media documents that contain the content chunks.",
         "properties": {
             "name": {
                 "type": "string",
@@ -47,10 +52,10 @@
             },
             "parentId": {
                 "type": "string",
-                "pattern": "^[A-Za-z0-9+/=]{44}$",
                 "position": 2,
                 "maxLength": 44,
-                "description": "Document ID of the parent folder (for hierarchical organization)"
+                "pattern": "^[A-Za-z0-9+/=]{44}$",
+                "description": "Document ID of the parent manifest (folder). Omit for root items."
             },
             "description": {
                 "type": "string",
@@ -69,49 +74,84 @@
                 },
                 "description": "User-defined tags for categorization and search"
             },
+            "mimeType": {
+                "type": "string",
+                "position": 5,
+                "maxLength": 127,
+                "description": "MIME type of the file (e.g., 'image/jpeg', 'text/plain'). Typically omitted for folders."
+            },
+            "fileSize": {
+                "type": "integer",
+                "position": 6,
+                "minimum": 0,
+                "description": "Total file size in bytes. Use 0 or omit for folders."
+            },
+            "contentHash": {
+                "type": "string",
+                "position": 7,
+                "maxLength": 128,
+                "description": "Hash of the full reconstructed file for integrity verification (encoding/format defined by hashAlgorithm)."
+            },
+            "hashAlgorithm": {
+                "type": "string",
+                "position": 8,
+                "maxLength": 31,
+                "description": "Hash algorithm used for contentHash (e.g., 'sha256', 'sha384', 'blake3')."
+            },
+            "compressionScheme": {
+                "type": "string",
+                "position": 9,
+                "maxLength": 31,
+                "description": "Compression scheme applied to file content before chunking (e.g., 'none', 'gzip', 'zstd')."
+            },
+            "encryptionScheme": {
+                "type": "string",
+                "position": 10,
+                "maxLength": 31,
+                "description": "Encryption scheme used by the client (e.g., 'none', 'aes-256-gcm', 'xchacha20-poly1305')."
+            },
+            "chunkCount": {
+                "type": "integer",
+                "position": 11,
+                "minimum": 0,
+                "description": "Number of media documents required to reconstruct the file. Use 0 or omit for folders."
+            },
+            "chunkSizeBytes": {
+                "type": "integer",
+                "position": 12,
+                "minimum": 0,
+                "description": "Nominal max chunk size in bytes per media document. Recommended value: 20480."
+            },
             "mediaDocumentIds": {
                 "type": "array",
-                "position": 5,
+                "position": 13,
                 "minItems": 0,
                 "maxItems": 1000,
                 "items": {
                     "type": "string",
                     "format": "application/x.dash.dpp.identifier"
                 },
-                "description": "Array of document IDs for media content that make up this file"
+                "description": "Optional ordered list of media document IDs. Clients may also reconstruct by querying media by parentId and chunkIndex."
             },
             "createdAt": {
                 "type": "integer",
-                "position": 6,
+                "position": 14,
                 "minimum": 0,
                 "description": "Unix timestamp of creation"
             },
             "updatedAt": {
                 "type": "integer",
-                "position": 7,
+                "position": 15,
                 "minimum": 0,
                 "description": "Unix timestamp of last update"
-            },
-            "fileSize": {
-                "type": "integer",
-                "position": 8,
-                "minimum": 0,
-                "description": "Total file size in bytes (0 for folders)"
-            },
-            "mimeType": {
-                "type": "string",
-                "position": 9,
-                "maxLength": 127,
-                "description": "MIME type of the file (e.g., 'image/jpeg', 'text/plain')"
-            },
-            "encryptionScheme": {
-                "type": "string",
-                "position": 10,
-                "maxLength": 31,
-                "description": "Encryption scheme used for the file (e.g., 'none', 'aes-256-gcm')"
             }
         },
-        "required": ["name", "type", "createdAt", "updatedAt"],
+        "required": [
+            "name",
+            "type",
+            "createdAt",
+            "updatedAt"
+        ],
         "indices": [
             {
                 "name": "idx_ownerid",
@@ -170,87 +210,87 @@
             }
         ],
         "canBeDeleted": true,
-        "documentsMutable": false,
+        "documentsMutable": true,
         "additionalProperties": false
     },
     "media": {
         "type": "object",
-        "$comment": "Embedded media storage with chunking support for large files.",
+        "$comment": "Embedded media storage. Each media document stores up to 20KB across 4 payload arrays (5120 bytes each). Multiple documents can be chained via chunkIndex.",
         "properties": {
             "parentId": {
                 "type": "string",
-                "pattern": "^[A-Za-z0-9+/=]{44}$",
                 "position": 0,
                 "maxLength": 44,
-                "description": "Document ID of the master evoManifest document"
-            },
-            "title": {
-                "type": "string",
-                "position": 1,
-                "maxLength": 127,
-                "description": "Title of the media file (original filename)"
+                "pattern": "^[A-Za-z0-9+/=]{44}$",
+                "description": "Document ID of the parent manifest document"
             },
             "chunkIndex": {
                 "type": "integer",
-                "position": 2,
+                "position": 1,
                 "minimum": 0,
-                "description": "Index of this chunk for multi-chunk files (0-based)"
+                "description": "Index of this 20KB chunk (0-based)"
             },
             "totalChunks": {
                 "type": "integer",
-                "position": 3,
+                "position": 2,
                 "minimum": 1,
-                "description": "Total number of chunks for this media file"
+                "description": "Total number of chunks (media documents) for the complete file"
             },
             "size": {
                 "type": "integer",
-                "position": 4,
+                "position": 3,
                 "minimum": 0,
-                "description": "Size of this chunk in bytes"
+                "description": "Size of this chunk in bytes (sum of payload lengths)"
             },
             "totalSize": {
                 "type": "integer",
-                "position": 5,
+                "position": 4,
                 "minimum": 0,
-                "description": "Total size of the complete media file in bytes"
+                "description": "Total file size in bytes"
+            },
+            "chunkHash": {
+                "type": "string",
+                "position": 5,
+                "maxLength": 128,
+                "description": "Hash of this chunk's raw bytes (payload1..payload4 concatenated), encoding/format defined by hashAlgorithm."
+            },
+            "hashAlgorithm": {
+                "type": "string",
+                "position": 6,
+                "maxLength": 31,
+                "description": "Hash algorithm used for chunkHash (e.g., 'sha256', 'blake3')."
             },
             "payload1": {
-                "type": "array",
-                "position": 6,
-                "minItems": 1,
-                "maxItems": 5120,
-                "byteArray": true,
-                "description": "Binary representation of media data (chunk 1)"
-            },
-            "payload2": {
                 "type": "array",
                 "position": 7,
                 "minItems": 1,
                 "maxItems": 5120,
                 "byteArray": true,
-                "description": "Binary representation of media data (chunk 2)"
+                "description": "Binary representation of media data."
+            },
+            "payload2": {
+                "type": "array",
+                "position": 8,
+                "minItems": 0,
+                "maxItems": 5120,
+                "byteArray": true,
+                "description": "Binary representation of media data."
             },
             "payload3": {
                 "type": "array",
-                "position": 8,
-                "minItems": 1,
+                "position": 9,
+                "minItems": 0,
                 "maxItems": 5120,
                 "byteArray": true,
-                "description": "Binary representation of media data (chunk 3)"
+                "description": "Binary representation of media data."
             },
             "payload4": {
                 "type": "array",
-                "position": 9,
-                "minItems": 1,
+                "position": 10,
+                "minItems": 0,
                 "maxItems": 5120,
                 "byteArray": true,
-                "description": "Binary representation of media data (chunk 4)"
-            },
-            "checksum": {
-                "type": "string",
-                "position": 10,
-                "maxLength": 88,
-                "description": "Checksum/hash of the payload for integrity verification"
+                "description": "Binary representation of media data."
             },
             "createdAt": {
                 "type": "integer",
@@ -259,7 +299,14 @@
                 "description": "Unix timestamp when this chunk was created"
             }
         },
-        "required": ["parentId", "title", "chunkIndex", "totalChunks", "size", "createdAt"],
+        "required": [
+            "parentId",
+            "chunkIndex",
+            "totalChunks",
+            "size",
+            "payload1",
+            "createdAt"
+        ],
         "indices": [
             {
                 "name": "idx_ownerid",
@@ -271,6 +318,7 @@
             },
             {
                 "name": "idx_parent_chunk",
+                "unique": true,
                 "properties": [
                     {
                         "parentId": "asc"
@@ -281,7 +329,7 @@
                 ]
             },
             {
-                "name": "idx_parent_updated",
+                "name": "idx_parent_created",
                 "properties": [
                     {
                         "parentId": "asc"
