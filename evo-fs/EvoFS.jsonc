@@ -2,9 +2,9 @@
  * Copyright (c) 2025 Sansbank DAO
  * Released under the MIT License.
  *
- * Evolution File
+ * Evolution File System
  *
- * EvoFiles are a decentralized file system for Dash Platform.
+ * EvoFS is a decentralized file system for Dash Platform.
  *
  * The purpose of this contract is to:
  *   - Organize files and folders in a hierarchical structure
@@ -27,7 +27,7 @@
  *
  * Version     : 01
  * Script Hash : 0x0
- * Namespace   : EvoFile
+ * Namespace   : EvoFS
  *
  * For more information, please visit the following resources:
  * - https://sansbank.org/contracts
@@ -36,23 +36,31 @@
 {
     "manifest": {
         "type": "object",
-        "$comment": "Master controller for an EvoFile entry (file or folder). For files, it manages one or more media documents that contain the content chunks.",
+        "$comment": "Master controller for an EvoFS entry (file or folder). For files, it manages one or more media documents that contain the content chunks.",
         "properties": {
             "name": {
                 "type": "string",
                 "position": 0,
+                "minLength": 1,
                 "maxLength": 127,
                 "description": "Display name of the file or folder"
             },
-            "type": {
+            "kind": {
                 "type": "string",
                 "position": 1,
+                "maxLength": 6,
+                "description": "Recommended: 'file' or 'folder'."
+            },
+            "type": {
+                "type": "string",
+                "position": 2,
+                "minLength": 1,
                 "maxLength": 31,
-                "description": "Type identifier: 'folder', 'document', 'image', 'audio', 'video', etc."
+                "description": "Client-defined classification (e.g. 'document', 'image', 'audio', 'video')."
             },
             "parentId": {
                 "type": "array",
-                "position": 2,
+                "position": 3,
                 "maxItems": 32,
                 "minItems": 32,
                 "byteArray": true,
@@ -61,74 +69,77 @@
             },
             "description": {
                 "type": "string",
-                "position": 3,
+                "position": 4,
                 "maxLength": 511,
                 "description": "Optional description of the file/folder contents"
             },
             "tags": {
                 "type": "array",
-                "position": 4,
+                "position": 5,
                 "minItems": 0,
                 "maxItems": 20,
                 "items": {
                     "type": "string",
+                    "minLength": 1,
                     "maxLength": 31
                 },
                 "description": "User-defined tags for categorization and search"
             },
             "mimeType": {
                 "type": "string",
-                "position": 5,
+                "position": 6,
                 "maxLength": 127,
                 "description": "MIME type of the file (e.g., 'image/jpeg', 'text/plain'). Typically omitted for folders."
             },
             "fileSize": {
                 "type": "integer",
-                "position": 6,
+                "position": 7,
                 "minimum": 0,
                 "description": "Total file size in bytes. Use 0 or omit for folders."
             },
             "contentHash": {
                 "type": "string",
-                "position": 7,
+                "position": 8,
+                "minLength": 1,
                 "maxLength": 128,
-                "description": "Hash of the full reconstructed file for integrity verification (encoding/format defined by hashAlgorithm)."
+                "description": "Hash of the full reconstructed file for integrity verification (encoding/format defined by hashAlgorithm and hashEncoding)."
             },
             "hashAlgorithm": {
                 "type": "string",
-                "position": 8,
+                "position": 9,
+                "minLength": 1,
                 "maxLength": 31,
                 "description": "Hash algorithm used for contentHash (e.g., 'sha256', 'sha384', 'blake3')."
             },
             "compressionScheme": {
                 "type": "string",
-                "position": 9,
+                "position": 10,
                 "maxLength": 31,
                 "description": "Compression scheme applied to file content before chunking (e.g., 'none', 'gzip', 'zstd')."
             },
             "encryptionScheme": {
                 "type": "string",
-                "position": 10,
+                "position": 11,
                 "maxLength": 31,
                 "description": "Encryption scheme used by the client (e.g., 'none', 'aes-256-gcm', 'xchacha20-poly1305')."
             },
             "chunkCount": {
                 "type": "integer",
-                "position": 11,
+                "position": 12,
                 "minimum": 0,
                 "description": "Number of media documents required to reconstruct the file. Use 0 or omit for folders."
             },
             "chunkSizeBytes": {
                 "type": "integer",
-                "position": 12,
+                "position": 13,
                 "minimum": 0,
-                "description": "Nominal max chunk size in bytes per media document. Recommended value: 20480."
+                "description": "Nominal max chunk size in bytes per media document. Recommended value: 20480 (validate against Platform document size limits)."
             },
             "mediaIds": {
                 "type": "array",
-                "position": 13,
+                "position": 14,
                 "minItems": 0,
-                "maxItems": 1000,
+                "maxItems": 256,
                 "items": {
                     "type": "array",
                     "maxItems": 32,
@@ -136,7 +147,13 @@
                     "byteArray": true,
                     "contentMediaType": "application/x.dash.dpp.identifier"
                 },
-                "description": "Optional ordered list of media document IDs. Clients may also reconstruct by querying media by parentId and chunkIndex."
+                "description": "Optional ordered list of media document IDs. For larger files, reconstruct by querying media by parentId and chunkIndex."
+            },
+            "hashEncoding": {
+                "type": "string",
+                "position": 15,
+                "maxLength": 15,
+                "description": "Optional: encoding for contentHash (e.g., 'hex', 'base64', 'base64url')."
             }
         },
         "required": [
@@ -160,6 +177,36 @@
                     },
                     {
                         "$ownerId": "asc"
+                    }
+                ]
+            },
+            {
+                "name": "idx_parent_owner_name",
+                "unique": true,
+                "properties": [
+                    {
+                        "parentId": "asc"
+                    },
+                    {
+                        "$ownerId": "asc"
+                    },
+                    {
+                        "name": "asc"
+                    }
+                ]
+            },
+            {
+                "name": "idx_parent_owner_updated",
+                "unique": false,
+                "properties": [
+                    {
+                        "parentId": "asc"
+                    },
+                    {
+                        "$ownerId": "asc"
+                    },
+                    {
+                        "$updatedAt": "desc"
                     }
                 ]
             },
@@ -221,7 +268,7 @@
                 "type": "integer",
                 "position": 1,
                 "minimum": 0,
-                "description": "Index of this 20KB chunk (0-based)"
+                "description": "Index of this chunk (0-based)"
             },
             "totalChunks": {
                 "type": "integer",
@@ -244,12 +291,14 @@
             "chunkHash": {
                 "type": "string",
                 "position": 5,
+                "minLength": 1,
                 "maxLength": 128,
-                "description": "Hash of this chunk's raw bytes (payload1..payload4 concatenated), encoding/format defined by hashAlgorithm."
+                "description": "Hash of this chunk's raw bytes (payload1..payload4 concatenated), encoding/format defined by hashAlgorithm and hashEncoding."
             },
             "hashAlgorithm": {
                 "type": "string",
                 "position": 6,
+                "minLength": 1,
                 "maxLength": 31,
                 "description": "Hash algorithm used for chunkHash (e.g., 'sha256', 'blake3')."
             },
@@ -284,6 +333,12 @@
                 "maxItems": 5120,
                 "byteArray": true,
                 "description": "Binary representation of media data."
+            },
+            "hashEncoding": {
+                "type": "string",
+                "position": 11,
+                "maxLength": 15,
+                "description": "Optional: encoding for chunkHash (e.g., 'hex', 'base64', 'base64url')."
             }
         },
         "required": [
@@ -291,6 +346,9 @@
             "chunkIndex",
             "totalChunks",
             "size",
+            "totalSize",
+            "chunkHash",
+            "hashAlgorithm",
             "payload1"
         ],
         "indices": [
@@ -303,11 +361,14 @@
                 ]
             },
             {
-                "name": "idx_parent_chunk",
+                "name": "idx_parent_owner_chunk",
                 "unique": true,
                 "properties": [
                     {
                         "parentId": "asc"
+                    },
+                    {
+                        "$ownerId": "asc"
                     },
                     {
                         "chunkIndex": "asc"
@@ -315,10 +376,13 @@
                 ]
             },
             {
-                "name": "idx_parent_created",
+                "name": "idx_parent_owner_created",
                 "properties": [
                     {
                         "parentId": "asc"
+                    },
+                    {
+                        "$ownerId": "asc"
                     },
                     {
                         "$createdAt": "desc"
