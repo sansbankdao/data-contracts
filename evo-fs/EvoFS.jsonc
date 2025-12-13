@@ -130,16 +130,9 @@
                 "minimum": 0,
                 "description": "Nominal max chunk size in bytes per media document. Recommended value: 20480 (validate against Platform document size limits)."
             },
-            "mediaIds": {
-                "type": "string",
-                "position": 14,
-                "minLength": 0,
-                "maxLength": 5120,
-                "description": "Optional ordered list of media document IDs. (Maximum of 160). For larger files, reconstruct by querying media by parentId and chunkIndex."
-            },
             "hashEncoding": {
                 "type": "string",
-                "position": 15,
+                "position": 14,
                 "maxLength": 15,
                 "description": "Optional: encoding for contentHash (e.g., 'hex', 'base64', 'base64url')."
             }
