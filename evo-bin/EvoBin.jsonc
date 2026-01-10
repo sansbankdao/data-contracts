@@ -2,9 +2,9 @@
  * Copyright (c) 2025 Sansbank DAO
  * Released under the MIT License.
  *
- * Evolution File System
+ * Evolution Bin
  *
- * EvoFS is a decentralized file system for Dash Platform.
+ * EvoBin is a decentralized file system for Dash Platform.
  *
  * The purpose of this contract is to:
  *   - Organize files and folders in a hierarchical structure
@@ -27,7 +27,7 @@
  *
  * Version     : 01
  * Script Hash : 0x0
- * Namespace   : EvoFS
+ * Namespace   : EvoBin
  *
  * For more information, please visit the following resources:
  * - https://sansbank.org/contracts
@@ -36,7 +36,7 @@
 {
     "manifest": {
         "type": "object",
-        "$comment": "Master controller for an EvoFS entry (file or folder). For files, it manages one or more media documents that contain the content chunks.",
+        "$comment": "Master controller for an EvoBin entry (file or folder). For files, it manages one or more media documents that contain the content chunks.",
         "properties": {
             "name": {
                 "type": "string",
